@@ -1,0 +1,1803 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="min-h-screen bg-white py-10">
+
+    <div class="max-w-6xl mx-auto px-4">
+
+        <div
+            class="bg-white shadow-md border border-gray-100 rounded-3xl p-8 relative">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mt-4">
+
+            <div class="flex items-center gap-10">
+
+                <a href="{% url 'followers_page' profile_user.username %}"
+                    class="flex flex-col items-center hover:scale-105 transition">
+                    <span class="text-2xl font-bold">{{ followers_count }}</span>
+                    <span class="text-gray-500 text-sm">Followers</span>
+                </a>
+
+                <a href="{% url 'followers_page' profile_user.username %}"
+                    class="flex flex-col items-center hover:scale-105 transition">
+                    <span class="text-2xl font-bold">{{ following_count }}</span>
+                    <span class="text-gray-500 text-sm">Following</span>
+                </a>
+
+            </div>
+
+            {% if request.user != profile_user %}
+
+            <form action="{% url 'follow_user' profile_user.username %}" method="POST">
+                {% csrf_token %}
+
+                {% if is_following %}
+                <button
+                    class="bg-gray-100 hover:bg-red-500 hover:text-white text-gray-800 px-6 py-2.5 rounded-full font-semibold transition-all duration-300 border">
+                    Unsubscribe
+                </button>
+                {% else %}
+                <button
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-full font-semibold transition-all duration-300 shadow-md">
+                    Subscribe
+                </button>
+                {% endif %}
+            </form>
+
+            {% endif %}
+
+        </div>
+            <div id="socialModal"
+                class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+
+                <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+
+                    <h2 class="text-xl font-bold mb-4">
+                        Manage social links
+                    </h2>
+
+                    <div class="space-y-4">
+
+                        <!-- SELECT -->
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                PLATFORM
+                            </label>
+
+                            <select id="socialSelect"
+                                class="w-full border rounded p-2">
+
+                                <option value="website"
+                                    data-url="{{ profile_user.profile.website|default:'' }}">
+                                    Website
+                                </option>
+
+                                <option value="instagram_url"
+                                    data-url="{{ profile_user.profile.instagram_url|default:'' }}">
+                                    Instagram
+                                </option>
+
+                                <option value="facebook_url"
+                                    data-url="{{ profile_user.profile.facebook_url|default:'' }}">
+                                    Facebook
+                                </option>
+
+                                <option value="telegram_url"
+                                    data-url="{{ profile_user.profile.telegram_url|default:'' }}">
+                                    Telegram
+                                </option>
+
+                                <option value="youtube_url"
+                                    data-url="{{ profile_user.profile.youtube_url|default:'' }}">
+                                    YouTube
+                                </option>
+
+                                <option value="tiktok_url"
+                                    data-url="{{ profile_user.profile.tiktok_url|default:'' }}">
+                                    TikTok
+                                </option>
+
+                                <option value="twitter_url"
+                                    data-url="{{ profile_user.profile.twitter_url|default:'' }}">
+                                    Twitter/X
+                                </option>
+
+                                <option value="discord_url"
+                                    data-url="{{ profile_user.profile.discord_url|default:'' }}">
+                                    Discord
+                                </option>
+
+                                <option value="twitch_url"
+                                    data-url="{{ profile_user.profile.twitch_url|default:'' }}">
+                                    Twitch
+                                </option>
+
+                                <option value="sponsorship_url"
+                                    data-url="{{ profile_user.profile.sponsorship_url|default:'' }}">
+                                    Sponsorship
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                        <!-- URL -->
+                        <div>
+
+                            <label class="text-sm font-semibold">
+                                URL
+                            </label>
+
+                            <input
+                                type="url"
+                                id="socialInput"
+                                placeholder="https://"
+                                class="w-full border rounded p-2">
+                            <p id="socialError"
+                                class="text-red-500 text-sm mt-2"></p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="flex justify-end gap-2 mt-5">
+
+                        <button
+                            type="button"
+                            id="closeSocialModal"
+                            class="px-4 py-2 bg-gray-300 rounded">
+
+                            Cancel
+
+                        </button>
+
+                        <button
+                            type="button"
+                            id="saveSocialBtn"
+                            class="px-4 py-2 bg-yellow-500 rounded font-semibold">
+
+                            Save
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="max-w-5xl mx-auto">
+
+                    <div
+                        class="bg-white shadow-lg rounded-2xl p-6 flex flex-col md:flex-row gap-8">
+                        {% if request.user == profile_user %}
+                        <a href="{% url 'logout' %}"
+                            onclick="return confirm('Are you sure you want to logout?')"
+                            class="absolute top-6 right-6 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold transition shadow-md mr-8">
+                            Logout
+                        </a>
+                        {% endif %}
+                        <div class="flex-shrink-0">
+                            <div
+                                class="w-32 h-32 relative rounded-full bg-gray-900 text-white flex items-center justify-center text-4xl font-bold overflow-hidden shadow-md">
+
+                                {% if profile_user.profile.avatar %}
+                                <img id="avatarPreview"
+                                    src="{{ profile_user.profile.avatar.url }}"
+                                    class="w-full h-full object-cover">
+                                <label
+                                    id="cameraBtn"
+                                    for="avatarInput"
+                                    title="Change avatar"
+                                    class="hidden absolute bottom-1 right-1 flex items-center justify-center w-10 h-10 bg-yellow-500 hover:bg-yellow-600 text-black rounded-full shadow cursor-pointer transition z-10">
+                                    <svg width="64px" height="64px"
+                                        viewBox="0 0 1024 1024" class="icon"
+                                        version="1.1"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="#000000"><g id="SVGRepo_bgCarrier"
+                                            stroke-width="0"></g><g
+                                            id="SVGRepo_tracerCarrier"
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"></g><g
+                                            id="SVGRepo_iconCarrier"><path
+                                                d="M732.1 399.3C534.6 356 696.5 82.1 425.9 104.8s-527.2 645.8-46.8 791.7 728-415 353-497.2z"
+                                                fill="#d88046"></path><path
+                                                d="M695.5 779.5c-5.7 0-11.3-0.8-16.9-2.3l-402-112.4c-16.1-4.5-29.4-15-37.6-29.5a62 62 0 0 1-5.7-47.5l65-232.6a62.64 62.64 0 0 1 60.1-45.4c5.7 0 11.3 0.8 16.9 2.3L508 349.2c0.3 0.1 0.6 0.1 1 0.1 1.2 0 2.3-0.6 2.9-1.6l21.3-31.5c7.5-11.1 20-17.7 33.4-17.7 3.7 0 7.4 0.5 11 1.5L695 332.9a40.03 40.03 0 0 1 29.5 36.8l1.9 37.6c0.1 1.6 1.1 2.9 2.6 3.3l48.2 13.5c16.1 4.5 29.4 15 37.6 29.5a62 62 0 0 1 5.7 47.5l-65 232.6c-7.4 27-32.1 45.8-60 45.8z"
+                                                fill="#FFFFFF"></path><path
+                                                d="M566.5 306c3 0 6 0.4 9 1.3L693 340.1a32.87 32.87 0 0 1 24.1 30l1.9 37.7a11 11 0 0 0 8 10.1l48.2 13.5a55.03 55.03 0 0 1 38.2 67.8l-65.1 232.6a55.06 55.06 0 0 1-53 40.2c-4.9 0-9.9-0.7-14.9-2l-402-112.4a55.03 55.03 0 0 1-38.2-67.8l65.1-232.6c6.9-24.2 28.9-40 52.9-40 4.9 0 9.9 0.7 14.9 2l132.7 37.1c1 0.3 2 0.4 3 0.4 3.6 0 7.1-1.8 9.1-4.9l21.3-31.4c6.3-9.2 16.5-14.4 27.3-14.4m0-14.9c-15.9 0-30.6 7.8-39.5 21l-19.7 29.2L377.4 305c-6.2-1.7-12.5-2.6-18.9-2.6a70.4 70.4 0 0 0-41.8 13.9c-12.4 9.2-21.2 22-25.5 36.9v0.1l-65.1 232.6c-10.4 37.1 11.4 75.8 48.5 86.2l402 112.4c6.2 1.7 12.5 2.6 18.9 2.6 31.2 0 58.9-21 67.3-51.1l65-232.6c5-18 2.8-36.9-6.4-53.1-9.2-16.3-24.1-28-42.1-33l-45.5-12.7-1.8-34.9a47.6 47.6 0 0 0-35-43.6l-117.5-32.9a39.3 39.3 0 0 0-13-2.1z"
+                                                fill="#151B28"></path><path
+                                                d="M686 365.2c2.9 0.8 4.9 3.3 5 6.3l1.9 37.6c0.4 16.2 11.3 30.2 26.9 34.6l48.2 13.5a28.98 28.98 0 0 1 20.1 35.7l-65 232.6c-4.6 15-20.4 23.6-35.5 19.3l-402-112.4a28.98 28.98 0 0 1-20.1-35.7l65.1-232.6a28.87 28.87 0 0 1 35.6-19.8l132.7 37.1c15.6 4.3 32.2-2 40.9-15.6l21-30.7c1.6-2.5 4.7-3.6 7.5-2.8L686 365.2"
+                                                fill="#efe92e"></path><path
+                                                d="M597.6 454.5c56.2 15.7 89 74 73.3 130.2-15.7 56.2-74 89-130.2 73.3-56.2-15.7-89-74-73.3-130.2 15.9-56.1 74-88.8 130.2-73.3m7-25.1c-70.1-19.6-142.8 21.3-162.3 91.4-19.6 70.1 21.3 142.8 91.4 162.3 70.1 19.6 142.8-21.3 162.3-91.4 19.5-70-21.4-142.6-91.4-162.3z m0 0"
+                                                fill></path><path
+                                                d="M580.1 513.2a50.39 50.39 0 0 1-27 97.1 50.44 50.44 0 0 1-35.2-61.9 50.5 50.5 0 0 1 62.2-35.2"
+                                                fill="#5e5add"></path><path
+                                                d="M568.1 635.9c-28.9 0-55.7-15.6-70-41.4a79.69 79.69 0 0 1 7.6-88.8c20.4-25.4 53.8-36 85-26.8 42 12.3 66.5 56.6 54.6 98.7-8.9 31.4-35.5 54-67.9 57.8-3.1 0.3-6.2 0.5-9.3 0.5z m0-136c-16.7 0-32.7 7.5-43.5 21a55.6 55.6 0 0 0-5.3 61.9c11 19.9 32.7 31.1 55.3 28.5a55.45 55.45 0 0 0 47.3-40.3c8.3-29.4-8.8-60.2-38-68.8-5.2-1.6-10.5-2.3-15.8-2.3zM441.2 310.6L391 296.5c-6.9-1.9-11-9.1-9-16.1 1.9-6.9 9.1-11 16.1-9l50.2 14.1c6.9 1.9 11 9.1 9 16.1-1.9 6.9-9.1 10.9-16.1 9z m0 0M413.5 409.8l-50.2-14.1c-6.9-1.9-11-9.1-9-16.1 1.9-6.9 9.1-11 16.1-9.1l50.2 14.1c6.9 1.9 11 9.1 9 16.1-2 7-9.2 11.1-16.1 9.1z m0 0"
+                                                fill></path></g></svg>
+                                
+                            </label>
+
+                            
+
+                        
+
+                            <!-- badge -->
+                            {% if donation_level == 'legend' %}
+                                <span class="absolute -bottom-1 -right-1 text-xs z-20">🌟</span>
+                            {% elif donation_level == 'supporter' %}
+                                <span class="absolute -bottom-1 -right-1 text-xs z-20">🚀</span>
+                            {% elif donation_level == 'friend' %}
+                                <span class="absolute -bottom-1 -right-1 text-xs z-20">💙</span>
+                            {% endif %}
+
+
+                            {% else %}
+
+                            <img id="avatarPreview"
+                                class="w-full h-full object-cover hidden">
+
+                            <span id="avatarText">
+                                {{profile_user.first_name|default:profile_user.username|slice:":1"|upper}}
+                                {{profile_user.last_name|default:""|slice:":1"|upper}}
+                            </span>
+
+                            <label id="cameraBtn"
+                                for="avatarInput"
+                                class="hidden absolute bottom-1 right-1 w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center cursor-pointer">
+                                📷
+                            </label>
+                            {% endif %}
+                            <input
+                            type="file"
+                            id="avatarInput"
+                            name="avatar"
+                            accept="image/*"
+                            class="hidden">
+
+                        </div>
+                    </div>
+
+                    <div class="flex-1 space-y-5">
+                        <div class="flex items-center gap-2">
+
+                            <h1 class="text-4xl font-bold text-gray-900">
+                                {{ profile_user.username }}
+                            </h1>
+                            {% if request.user == profile_user %}
+                            <button type="button"
+                                id="editBtn"
+                                onclick="enableEdit()"
+                                class="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white/70 backdrop-blur border border-gray-200 rounded-full hover:bg-white transition shadow-sm">
+
+                                ✏️ Edit
+                            </button>
+                            {% endif %}
+
+                        </div>
+
+                        <input id="usernameEdit"
+                            type="text"
+                            name="username"
+                            value="{{ profile_user.username }}"
+                            class="hidden border rounded-xl px-3 py-2 w-full">
+
+                        <div class="space-y-2">
+
+                            <p id="emailText" class="text-gray-400">
+                                {{ profile_user.email }}
+                            </p>
+
+                            <input id="emailEdit"
+                                type="email"
+                                name="email"
+                                required
+                                value="{{ profile_user.email }}"
+                                class="hidden border rounded-xl px-3 py-2 w-full">
+
+                        </div>
+                        <div class="space-y-2">
+                            <p id="emailText" class="text-gray-400">
+                                Joined {{ profile_user.date_joined|date:"d M Y" }}
+                            </p>
+
+                            <input
+                                id="emailEdit"
+                                type="email"
+                                name="email"
+                                required
+                                value="{{ profile_user.email }}"
+                                class="hidden border rounded-xl px-3 py-2 w-full">
+                        </div>
+                        
+
+                        <div class="space-y-2">
+
+                            <h2 class="text-lg font-semibold text-gray-800">
+                                About
+                            </h2>
+
+                            <p id="bioText"
+                                class="text-gray-600 leading-relaxed">
+                                {{profile_user.profile.bio|default:"No bio yet."}}
+                            </p>
+
+                            <textarea id="bioEdit"
+                                name="bio"
+                                rows="4"
+                                class="hidden border rounded-xl px-3 py-2 w-full">
+
+                    {{ profile_user.profile.bio }}
+
+                </textarea>
+
+                        </div>
+                        
+                        <div id="actionButtons"
+                            class="hidden flex gap-3 pt-2">
+
+                            <button type="submit"
+                                class="px-4 py-2 bg-green-600 text-white rounded-xl">
+                                Save
+                            </button>
+
+                            <button type="button"
+                                onclick="cancelEdit()"
+                                class="px-4 py-2 bg-gray-300 text-black rounded-xl">
+                                Cancel
+                            </button>
+
+                        </div>
+
+                        {% if profile_user.profile.website or profile_user.profile.instagram_url or profile_user.profile.facebook_url or profile_user.profile.telegram_url %}
+
+                        <div id="socialLinksWrapper"
+                            class="mt-4 border-t pt-4">
+
+                            <h3 class="font-bold text-lg mb-3">
+                                Social Links
+                            </h3>
+
+                            <div id="socialLinksContainer"
+                                class="flex flex-wrap gap-2">
+
+                                {% if profile_user.profile.website %}
+                                <a href="{{ profile_user.profile.website }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    🌐 Website
+                                </a>
+                                {% endif %}
+
+                                {% if profile_user.profile.instagram_url %}
+                                <a
+                                    href="{{ profile_user.profile.instagram_url }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    📷 Instagram
+                                </a>
+                                {% endif %}
+
+                                {% if profile_user.profile.facebook_url %}
+                                <a
+                                    href="{{ profile_user.profile.facebook_url }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    👍 Facebook
+                                </a>
+                                {% endif %}
+
+                                {% if profile_user.profile.telegram_url %}
+                                <a
+                                    href="{{ profile_user.profile.telegram_url }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    ✈️ Telegram
+                                </a>
+                                {% endif %}
+
+                                {% if profile_user.profile.youtube_url %}
+                                <a href="{{ profile_user.profile.youtube_url }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    ▶️ YouTube
+                                </a>
+                                {% endif %}
+
+                                {% if profile_user.profile.tiktok_url %}
+                                <a href="{{ profile_user.profile.tiktok_url }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    🎵 TikTok
+                                </a>
+                                {% endif %}
+
+                                {% if profile_user.profile.twitter_url %}
+                                <a href="{{ profile_user.profile.twitter_url }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    𝕏 Twitter
+                                </a>
+                                {% endif %}
+
+                                {% if profile_user.profile.discord_url %}
+                                <a href="{{ profile_user.profile.discord_url }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    💬 Discord
+                                </a>
+                                {% endif %}
+
+                                {% if profile_user.profile.twitch_url %}
+                                <a href="{{ profile_user.profile.twitch_url }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    🎮 Twitch
+                                </a>
+                                {% endif %}
+
+                                {% if profile_user.profile.sponsorship_url %}
+                                <a
+                                    href="{{ profile_user.profile.sponsorship_url }}"
+                                    target="_blank"
+                                    class="px-3 py-2 bg-gray-100 rounded">
+                                    💰 Sponsorship
+                                </a>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        {% endif %}
+                        
+                        {% if request.user == profile_user %}
+                        <button
+                            type="button"
+                            id="openSocialModal"
+                            class="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 rounded-md font-semibold">
+                            ➕ Social Links
+                        </button>
+                        {% endif %}
+                        {% if request.user == profile_user %}
+                        <div class="mt-4 p-5 rounded-xl border bg-white shadow-sm">
+
+                            <h3 class="text-lg font-semibold mb-3">
+                                Your Support Level
+                            </h3>
+
+                            {% if donation_level == "whale" %}
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center text-xl">
+                                        💎
+                                    </div>
+                                    <div>
+                                        <p class="text-purple-600 font-bold text-lg">VIP Whale</p>
+                                        <p class="text-sm text-gray-500">Absolute top supporter. You are legendary beyond legend 🔥</p>
+                                    </div>
+                                </div>
+
+                            {% elif donation_level == "legend" %}
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-xl">
+                                        👑
+                                    </div>
+                                    <div>
+                                        <p class="text-yellow-600 font-bold text-lg">Legend</p>
+                                        <p class="text-sm text-gray-500">Top tier of supporters 👑</p>
+                                    </div>
+                                </div>
+
+                            {% elif donation_level == "elite" %}
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-xl">
+                                        🧠
+                                    </div>
+                                    <div>
+                                        <p class="text-indigo-600 font-bold text-lg">Elite Supporter</p>
+                                        <p class="text-sm text-gray-500">Elite level supporter 💎</p>
+                                    </div>
+                                </div>
+
+                            {% elif donation_level == "advanced" %}
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-xl">
+                                        🌟
+                                    </div>
+                                    <div>
+                                        <p class="text-purple-600 font-bold text-lg">Advanced Supporter</p>
+                                        <p class="text-sm text-gray-500">You are deeply supporting the project 🔥</p>
+                                    </div>
+                                </div>
+
+                            {% elif donation_level == "supporter" %}
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-xl">
+                                        🚀
+                                    </div>
+                                    <div>
+                                        <p class="text-blue-600 font-bold text-lg">Supporter</p>
+                                        <p class="text-sm text-gray-500">Strong support keeps the project growing</p>
+                                    </div>
+                                </div>
+
+                            {% elif donation_level == "friend" %}
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-xl">
+                                        💙
+                                    </div>
+                                    <div>
+                                        <p class="text-sky-500 font-bold text-lg">Friend of the Project</p>
+                                        <p class="text-sm text-gray-500">Every contribution matters</p>
+                                    </div>
+                                </div>
+
+                            {% elif donation_level == "new" %}
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-xl">
+                                        🌱
+                                    </div>
+                                    <div>
+                                        <p class="text-green-600 font-bold text-lg">New Supporter</p>
+                                        <p class="text-sm text-gray-500">First steps of support ❤️</p>
+                                    </div>
+                                </div>
+
+                            {% else %}
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-xl">
+                                        👤
+                                    </div>
+                                    <div>
+                                        <p class="text-gray-500 font-medium">Visitor</p>
+                                        <p class="text-sm text-gray-400">Support the project to unlock badges</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                        </div>
+                        {% endif %}
+
+                        
+                        {% if donation_total >= 0 %}
+                        {% if request.user == profile_user %}
+                        <div class="mt-4 p-4 rounded-xl border bg-white shadow-sm">
+
+                            <div class="flex justify-between items-center mb-2">
+                                <div class="text-sm text-gray-600">
+                                    Next level → {{ next_level }}
+                                </div>
+
+                                <div class="text-sm font-semibold text-gray-800">
+                                    {{ donation_total }}₴ / {{ next_goal|add:donation_total }}₴
+                                </div>
+                            </div>
+
+                            <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                                <div class="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-700"
+                                    style="width: {{ donation_progress }}%"></div>
+                            </div>
+
+                            <div class="flex justify-between text-xs text-gray-500 mt-2">
+                                <span>Keep supporting ❤️</span>
+                                <span>{{ next_goal }}₴ left</span>
+                            </div>
+
+                        </div>
+                        {% endif %}
+                        {% endif %}
+
+
+                    </div>
+
+                </div>
+
+                <div
+                    class="bg-stone-50 border border-stone-200 rounded-2xl p-6 mt-6 shadow-md">
+                    <h2 class="text-xl font-bold text-gray-900 mb-4">
+                        📊 Your Activity
+                    </h2>
+
+                    <div class="grid grid-cols-3 gap-3 md:gap-6">
+
+                        <div class="bg-gray-100 rounded-xl p-4 text-center">
+                            <div class="text-2xl font-bold">{{ratings_count}}
+                                ⭐</div>
+                            <div
+                                class="text-gray-600 text-sm md:text-base">Evaluations</div>
+                        </div>
+
+                        <div class="bg-gray-100 rounded-xl p-4 text-center">
+                            <div class="text-2xl font-bold">{{comments_count }}
+                                💬</div>
+                            <div
+                                class="text-gray-600 text-sm md:text-base">Comments</div>
+                        </div>
+
+                        <div class="bg-gray-100 rounded-xl p-4 text-center">
+                            <div class="text-2xl font-bold">{{posts_count}}
+                                📝</div>
+                            <div
+                                class="text-gray-600 text-sm md:text-base">Posts</div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </form>
+        
+
+        <h2 class="text-4xl font-extrabold text-center mt-10 mb-6
+           text-yellow-500 animate-pulse relative">
+            🔥 Top Posts
+
+            <span
+                class="absolute -top-2 -right-6 text-xl animate-bounce">✨</span>
+            <span
+                class="absolute -top-3 -left-6 text-lg animate-bounce">🔥</span>
+        </h2>
+        <div class="pointer-events-none fixed inset-0 overflow-hidden">
+
+            <div
+                class="absolute w-2 h-2 bg-yellow-400 rounded-full animate-bounce left-[10%] top-[20%]"></div>
+            <div
+                class="absolute w-2 h-2 bg-amber-500 rounded-full animate-ping left-[30%] top-[50%]"></div>
+            <div
+                class="absolute w-2 h-2 bg-yellow-300 rounded-full animate-bounce left-[70%] top-[30%]"></div>
+            <div
+                class="absolute w-2 h-2 bg-amber-400 rounded-full animate-ping left-[85%] top-[60%]"></div>
+
+        </div>
+        <div
+            class="transition-all duration-700 hover:scale-[1.01]"></div>
+        <div class="relative mt-6 overflow-hidden">
+            {% if similar_posts|length > 1 %}
+            <button onclick="moveSlide(-1)"
+                class="absolute left-3 top-1/2 -translate-y-1/2 z-10
+                bg-white shadow-md hover:shadow-lg
+                rounded-full p-3 transition">
+                <
+            </button>
+            {% endif %}
+
+            <div id="track"
+                class="flex transition-transform duration-500">
+
+                {% for post in similar_posts %}
+                <div class="min-w-full px-4">
+
+                    <div
+                        class="bg-white shadow-lg rounded-2xl p-5 border border-gray-100">
+
+                        <p
+                            class="text-sm text-gray-500 mb-3 uppercase font-bold tracking-wider">
+                            {{ post.category }}
+                        </p>
+
+                        {% if post.image %}
+                        <div class="relative">
+
+                            <img src="{{ post.image.url }}"
+                                class="w-full h-64 object-cover rounded-xl shadow-sm">
+
+                            <div
+                                class="absolute top-3 right-3 bg-black/70 text-white rounded-full px-3 py-1 text-xs flex items-center gap-1">
+
+                                <svg width="30px" height="30px"
+                                    viewBox="-2.4 -2.4 28.80 28.80"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"><g
+                                        id="SVGRepo_bgCarrier"
+                                        stroke-width="0"><path
+                                            transform="translate(-2.4, -2.4), scale(0.8999999999999999)"
+                                            d="M16,27.117480158217642C18.483364911923093,27.266007998897354,20.42549450363644,30.89473197004894,22.763575869387424,30.04471001012333C24.98377153781817,29.23754602466824,24.094379431691312,25.476604005208795,25.575542711400153,23.636240496448487C27.066018898921175,21.784305585714616,31.55572584917887,21.84290374959289,31.263266067766402,19.483740877848287C30.900339231243247,16.556146821154368,26.34830520603982,16.292255626243396,24.391461524420762,14.084703666454942C23.50085238177209,13.079990833883206,23.622967701525646,11.561692905762916,23.132889211254327,10.311710668178275C22.49031641136203,8.672780165891341,22.331020586855445,6.731579870691473,21.039521183828256,5.535326433301076C19.711697107041942,4.305427207345401,17.78188336197914,4.022130851825848,16,3.704860353352208C14.01053114950963,3.350628540338485,11.815117229317147,2.653866571069934,10.015185858665717,3.5724053810106593C8.211626281443262,4.492795732960323,7.755451937595421,6.840810839650338,6.59855243910949,8.502595753216431C5.512334548611136,10.062852720773325,3.563338411889657,11.226044184028304,3.370209393234429,13.117332711091743C3.1744679445746398,15.03420444118592,4.674873819550452,16.68046115030784,5.590335625685393,18.37593796402893C6.33469624117051,19.75452760714087,7.716158757398245,20.70331387704557,8.259621512090074,22.172745863985984C9.104352276333625,24.456755935726697,7.562925184745197,27.947315271510814,9.615132799508096,29.25831335609434C11.53083795654092,30.48211048725691,13.730818129612867,26.981762414240517,16,27.117480158217642"
+                                            fill="#5e58ff"
+                                            strokewidth="0"></path></g><g
+                                        id="SVGRepo_tracerCarrier"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></g><g
+                                        id="SVGRepo_iconCarrier">
+                                        <path
+                                            d="M6.03954 7.77203C3.57986 8.32856 2.35002 8.60682 2.05742 9.54773C1.76482 10.4886 2.60325 11.4691 4.2801 13.4299L4.71392 13.9372C5.19043 14.4944 5.42868 14.773 5.53586 15.1177C5.64305 15.4624 5.60703 15.8341 5.53498 16.5776L5.4694 17.2544C5.21588 19.8706 5.08912 21.1787 5.85515 21.7602C6.62118 22.3417 7.77268 21.8115 10.0757 20.7512L10.6715 20.4768C11.3259 20.1755 11.6531 20.0248 12 20.0248C12.3469 20.0248 12.6741 20.1755 13.3285 20.4768L13.9243 20.7512C16.2273 21.8115 17.3788 22.3417 18.1449 21.7602C18.9109 21.1787 18.7841 19.8706 18.5306 17.2544M19.7199 13.4299C21.3968 11.4691 22.2352 10.4886 21.9426 9.54773C21.65 8.60682 20.4201 8.32856 17.9605 7.77203L17.3241 7.62805C16.6251 7.4699 16.2757 7.39083 15.9951 7.17781C15.7144 6.96479 15.5345 6.64193 15.1745 5.99623L14.8468 5.40837C13.5802 3.13612 12.9469 2 12 2C11.0531 2 10.4198 3.13613 9.15316 5.40838"
+                                            stroke="#f5f541"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"></path>
+                                    </g></svg>
+
+                                {% if post.ratings_count > 0 %}
+                                <span class="font-bold text-yellow-300">
+                                    {{ post.avg_rating|floatformat:1 }}
+                                </span>
+                                {% else %}
+                                <span class="text-gray-300">Not
+                                    rated</span>
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+                        {% endif %}
+
+                        <p class="text-xs text-gray-400 mt-3">
+                            By <span class="text-gray-700 font-bold">
+                                {{ post.author.username }}
+                            </span>
+                            | {{ post.created_at|date:"M d, Y" }}
+                        </p>
+
+                        <h2
+                            class="text-xl font-bold mt-2 text-gray-900">
+                            {{ post.title }}
+                        </h2>
+
+                        <p class="text-gray-600 text-sm mt-2">
+                            {{ post.short_description|truncatechars:120}}
+                        </p>
+
+                        <a href="{% url 'post_detail' post.id %}"
+                            class="inline-block mt-3 bg-yellow-400 hover:bg-yellow-500 transition px-8 py-3 text-sm font-bold text-black uppercase">
+                            Read More >
+                        </a>
+
+                    </div>
+
+                </div>
+
+                {% empty %}
+                <div class="w-full text-center text-gray-500 py-10">
+                    No posts found
+                </div>
+                {% endfor %}
+
+            </div>
+            {% if similar_posts|length > 1 %}
+            <button onclick="moveSlide(1)"
+                class="absolute right-3 top-1/2 -translate-y-1/2 z-10
+                bg-white shadow-md hover:shadow-lg
+                rounded-full p-3 transition">
+                >
+            </button>
+            {% endif %}
+
+        </div>
+        {% if request.user == profile_user %}
+        <div class="max-w-6xl mx-auto mt-10">
+            <div class="flex justify-center gap-6 mb-10">
+
+                <button id="likedBtn"
+                    class="px-6 py-3 rounded-2xl bg-red-500 text-white font-bold text-lg shadow-lg transition hover:scale-105">
+                    ❤️ Liked
+                </button>
+
+                <button id="savedBtn"
+                    class="px-6 py-3 rounded-2xl bg-yellow-400 text-white font-bold text-lg shadow-lg transition hover:scale-105">
+                    🔖 Saved
+                </button>
+
+            </div>
+
+            <div id="likedPosts">
+
+                <div class="grid grid-cols-3 gap-2 sm:gap-4">
+
+                    {% for post in liked_posts %}
+
+                    <div
+                        class="post-card bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition">
+
+                        <div class="relative">
+
+                            {% if post.image %}
+                            <img src="{{ post.image.url }}"
+                                class="w-full h-28 sm:h-40 object-cover"
+                                alt="{{ post.title }}">
+                            <div
+                                class="absolute top-3 right-3 bg-black/70 text-white rounded-full px-3 py-1 text-xs flex items-center gap-1">
+
+                                <svg width="30px" height="30px"
+                                    viewBox="-2.4 -2.4 28.80 28.80"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"><g
+                                        id="SVGRepo_bgCarrier"
+                                        stroke-width="0"><path
+                                            transform="translate(-2.4, -2.4), scale(0.8999999999999999)"
+                                            d="M16,27.117480158217642C18.483364911923093,27.266007998897354,20.42549450363644,30.89473197004894,22.763575869387424,30.04471001012333C24.98377153781817,29.23754602466824,24.094379431691312,25.476604005208795,25.575542711400153,23.636240496448487C27.066018898921175,21.784305585714616,31.55572584917887,21.84290374959289,31.263266067766402,19.483740877848287C30.900339231243247,16.556146821154368,26.34830520603982,16.292255626243396,24.391461524420762,14.084703666454942C23.50085238177209,13.079990833883206,23.622967701525646,11.561692905762916,23.132889211254327,10.311710668178275C22.49031641136203,8.672780165891341,22.331020586855445,6.731579870691473,21.039521183828256,5.535326433301076C19.711697107041942,4.305427207345401,17.78188336197914,4.022130851825848,16,3.704860353352208C14.01053114950963,3.350628540338485,11.815117229317147,2.653866571069934,10.015185858665717,3.5724053810106593C8.211626281443262,4.492795732960323,7.755451937595421,6.840810839650338,6.59855243910949,8.502595753216431C5.512334548611136,10.062852720773325,3.563338411889657,11.226044184028304,3.370209393234429,13.117332711091743C3.1744679445746398,15.03420444118592,4.674873819550452,16.68046115030784,5.590335625685393,18.37593796402893C6.33469624117051,19.75452760714087,7.716158757398245,20.70331387704557,8.259621512090074,22.172745863985984C9.104352276333625,24.456755935726697,7.562925184745197,27.947315271510814,9.615132799508096,29.25831335609434C11.53083795654092,30.48211048725691,13.730818129612867,26.981762414240517,16,27.117480158217642"
+                                            fill="#5e58ff"
+                                            strokewidth="0"></path></g><g
+                                        id="SVGRepo_tracerCarrier"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></g><g
+                                        id="SVGRepo_iconCarrier">
+                                        <path
+                                            d="M6.03954 7.77203C3.57986 8.32856 2.35002 8.60682 2.05742 9.54773C1.76482 10.4886 2.60325 11.4691 4.2801 13.4299L4.71392 13.9372C5.19043 14.4944 5.42868 14.773 5.53586 15.1177C5.64305 15.4624 5.60703 15.8341 5.53498 16.5776L5.4694 17.2544C5.21588 19.8706 5.08912 21.1787 5.85515 21.7602C6.62118 22.3417 7.77268 21.8115 10.0757 20.7512L10.6715 20.4768C11.3259 20.1755 11.6531 20.0248 12 20.0248C12.3469 20.0248 12.6741 20.1755 13.3285 20.4768L13.9243 20.7512C16.2273 21.8115 17.3788 22.3417 18.1449 21.7602C18.9109 21.1787 18.7841 19.8706 18.5306 17.2544M19.7199 13.4299C21.3968 11.4691 22.2352 10.4886 21.9426 9.54773C21.65 8.60682 20.4201 8.32856 17.9605 7.77203L17.3241 7.62805C16.6251 7.4699 16.2757 7.39083 15.9951 7.17781C15.7144 6.96479 15.5345 6.64193 15.1745 5.99623L14.8468 5.40837C13.5802 3.13612 12.9469 2 12 2C11.0531 2 10.4198 3.13613 9.15316 5.40838"
+                                            stroke="#f5f541"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"></path>
+                                    </g></svg>
+
+                                {% if post.ratings_count > 0 %}
+                                <span class="font-bold text-yellow-300">
+                                    {{ post.avg_rating|floatformat:1 }}
+                                </span>
+                                {% else %}
+                                <span class="text-gray-300">Not
+                                    rated</span>
+                                {% endif %}
+
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="p-2 sm:p-3">
+                            <div class="p-2 sm:p-3 relative group">
+
+                            </div>
+
+                            <p
+                                class="text-[10px] sm:text-xs text-gray-400 uppercase font-bold truncate">
+                                {{ post.category }}
+                            </p>
+
+                            <h2
+                                class="text-sm sm:text-base font-bold mt-1 truncate">
+                                {{ post.title }}
+                            </h2>
+
+                            <p
+                                class="text-gray-600 text-[10px] sm:text-xs mt-1 line-clamp-2">
+                                {{post.short_description|truncatechars:60}}
+                            </p>
+
+                            <p
+                                class="text-[10px] text-gray-400 mt-1 hidden sm:block">
+                                {{ post.created_at|date:"M d, Y" }}
+                            </p>
+
+                            <div
+                                class="flex justify-between items-center mt-2">
+
+                                <a
+                                    href="{% url 'post_detail' post.id %}"
+                                    class="bg-yellow-400 hover:bg-yellow-500 px-2 py-1 text-[10px] sm:text-xs font-bold uppercase rounded transition">
+                                    Read
+                                </a>
+
+                            </div>
+
+                        </div>
+                        <div
+                            class="flex justify-center items-center gap-16 mt-8">
+
+                            <!-- ❤️ LIKE -->
+                            <div class="flex flex-col items-center">
+
+                                <button
+                                    class="like-btn transition duration-200 active:scale-90 hover:scale-110"
+                                    data-id="{{ post.id }}">
+
+                                    <svg
+                                        class="w-16 h-16 drop-shadow-lg"
+                                        viewBox="0 0 1024 1024"
+                                        xmlns="http://www.w3.org/2000/svg">
+
+                                        <path
+                                            class="heart-path transition duration-300"
+                                            d="M933.387 517.868C950.274 477.276 960 431.509 960 382.887c0-165.301-109.993-299.305-245.677-299.305-83.964 0-158.011 51.39-202.323 129.684-44.31-78.295-118.357-129.685-202.321-129.685C173.994 83.581 64 217.586 64 382.887c0 57.701 13.632 111.398 36.851 157.102 56.694 135.957 196.112 269.389 414.1 400.428 149.872-95.245 273.613-208.473 368.923-341.271 14.435-16.802 49.513-81.278 49.513-81.278z"
+                                            fill="{% if user in post.likes.all %}#ef4444{% else %}#9ca3af{% endif %}" />
+
+                                    </svg>
+
+                                </button>
+
+                                <span
+                                    class="mt-2 text-lg font-semibold text-gray-600">
+                                    Like
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+                    <div
+                        class="col-span-3 text-center text-gray-500 text-xl">
+                        No liked posts ❤️
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+            <div id="savedPosts" class="hidden">
+
+                <div class="grid grid-cols-3 gap-2 sm:gap-4">
+
+                    {% for post in saved_posts %}
+
+                    <div
+                        class="post-card bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition">
+
+                        <div class="relative">
+
+                            {% if post.image %}
+                            <img src="{{ post.image.url }}"
+                                class="w-full h-28 sm:h-40 object-cover"
+                                alt="{{ post.title }}">
+                            <div
+                                class="absolute top-3 right-3 bg-black/70 text-white rounded-full px-3 py-1 text-xs flex items-center gap-1">
+
+                                <svg width="30px" height="30px"
+                                    viewBox="-2.4 -2.4 28.80 28.80"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"><g
+                                        id="SVGRepo_bgCarrier"
+                                        stroke-width="0"><path
+                                            transform="translate(-2.4, -2.4), scale(0.8999999999999999)"
+                                            d="M16,27.117480158217642C18.483364911923093,27.266007998897354,20.42549450363644,30.89473197004894,22.763575869387424,30.04471001012333C24.98377153781817,29.23754602466824,24.094379431691312,25.476604005208795,25.575542711400153,23.636240496448487C27.066018898921175,21.784305585714616,31.55572584917887,21.84290374959289,31.263266067766402,19.483740877848287C30.900339231243247,16.556146821154368,26.34830520603982,16.292255626243396,24.391461524420762,14.084703666454942C23.50085238177209,13.079990833883206,23.622967701525646,11.561692905762916,23.132889211254327,10.311710668178275C22.49031641136203,8.672780165891341,22.331020586855445,6.731579870691473,21.039521183828256,5.535326433301076C19.711697107041942,4.305427207345401,17.78188336197914,4.022130851825848,16,3.704860353352208C14.01053114950963,3.350628540338485,11.815117229317147,2.653866571069934,10.015185858665717,3.5724053810106593C8.211626281443262,4.492795732960323,7.755451937595421,6.840810839650338,6.59855243910949,8.502595753216431C5.512334548611136,10.062852720773325,3.563338411889657,11.226044184028304,3.370209393234429,13.117332711091743C3.1744679445746398,15.03420444118592,4.674873819550452,16.68046115030784,5.590335625685393,18.37593796402893C6.33469624117051,19.75452760714087,7.716158757398245,20.70331387704557,8.259621512090074,22.172745863985984C9.104352276333625,24.456755935726697,7.562925184745197,27.947315271510814,9.615132799508096,29.25831335609434C11.53083795654092,30.48211048725691,13.730818129612867,26.981762414240517,16,27.117480158217642"
+                                            fill="#5e58ff"
+                                            strokewidth="0"></path></g><g
+                                        id="SVGRepo_tracerCarrier"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></g><g
+                                        id="SVGRepo_iconCarrier">
+                                        <path
+                                            d="M6.03954 7.77203C3.57986 8.32856 2.35002 8.60682 2.05742 9.54773C1.76482 10.4886 2.60325 11.4691 4.2801 13.4299L4.71392 13.9372C5.19043 14.4944 5.42868 14.773 5.53586 15.1177C5.64305 15.4624 5.60703 15.8341 5.53498 16.5776L5.4694 17.2544C5.21588 19.8706 5.08912 21.1787 5.85515 21.7602C6.62118 22.3417 7.77268 21.8115 10.0757 20.7512L10.6715 20.4768C11.3259 20.1755 11.6531 20.0248 12 20.0248C12.3469 20.0248 12.6741 20.1755 13.3285 20.4768L13.9243 20.7512C16.2273 21.8115 17.3788 22.3417 18.1449 21.7602C18.9109 21.1787 18.7841 19.8706 18.5306 17.2544M19.7199 13.4299C21.3968 11.4691 22.2352 10.4886 21.9426 9.54773C21.65 8.60682 20.4201 8.32856 17.9605 7.77203L17.3241 7.62805C16.6251 7.4699 16.2757 7.39083 15.9951 7.17781C15.7144 6.96479 15.5345 6.64193 15.1745 5.99623L14.8468 5.40837C13.5802 3.13612 12.9469 2 12 2C11.0531 2 10.4198 3.13613 9.15316 5.40838"
+                                            stroke="#f5f541"
+                                            stroke-width="1.5"
+                                            stroke-linecap="round"></path>
+                                    </g></svg>
+
+                                {% if post.ratings_count > 0 %}
+                                <span class="font-bold text-yellow-300">
+                                    {{ post.avg_rating|floatformat:1 }}
+                                </span>
+                                {% else %}
+                                <span class="text-gray-300">Not
+                                    rated</span>
+                                {% endif %}
+
+                            </div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="p-2 sm:p-3">
+                            <div class="p-2 sm:p-3 relative group">
+
+                            </div>
+
+                            <p
+                                class="text-[10px] sm:text-xs text-gray-400 uppercase font-bold truncate">
+                                {{ post.category }}
+                            </p>
+
+                            <h2
+                                class="text-sm sm:text-base font-bold mt-1 truncate">
+                                {{ post.title }}
+                            </h2>
+
+                            <p
+                                class="text-gray-600 text-[10px] sm:text-xs mt-1 line-clamp-2">
+                                {{post.short_description|truncatechars:60}}
+                            </p>
+
+                            <p
+                                class="text-[10px] text-gray-400 mt-1 hidden sm:block">
+                                {{ post.created_at|date:"M d, Y" }}
+                            </p>
+
+                            <div
+                                class="flex justify-between items-center mt-2">
+
+                                <a
+                                    href="{% url 'post_detail' post.id %}"
+                                    class="bg-yellow-400 hover:bg-yellow-500 px-2 py-1 text-[10px] sm:text-xs font-bold uppercase rounded transition">
+                                    Read
+                                </a>
+
+                            </div>
+
+                        </div>
+                        <div
+                            class="flex justify-center items-center gap-16 mt-8">
+
+                            <!-- 📌 SAVE -->
+                            <div class="flex flex-col items-center">
+
+                                <button
+                                    class="save-btn transition duration-200 active:scale-90 hover:scale-110"
+                                    data-id="{{ post.id }}">
+
+                                    <svg
+                                        class="save-icon w-14 h-14 drop-shadow-lg"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="{% if user in post.saved_by.all %}#facc15{% else %}#ffffff{% endif %}"
+                                        stroke="{% if user in post.saved_by.all %}#facc15{% else %}#9ca3af{% endif %}"
+                                        stroke-width="2">
+
+                                        <path
+                                            d="M6 3H18a1 1 0 0 1 1 1V21l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+
+                                    </svg>
+
+                                </button>
+
+                                <span
+                                    class="mt-2 text-lg font-semibold text-gray-600">
+                                    Save
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    {% empty %}
+                    <div 
+                        class="col-span-3 text-center text-gray-500 text-xl">
+                        No saved posts 🔖
+                    </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+        {% endif %}
+
+        <h2 id="posts" class="text-5xl font-extrabold text-center mt-12 mb-10
+           bg-gradient-to-r from-amber-900 via-amber-700 to-amber-500
+           text-transparent bg-clip-text
+           animate-pulse" >
+            All Posts
+        </h2>
+        <div class="grid grid-cols-3 gap-2 sm:gap-4" >
+
+            {% for post in posts %}
+
+            <div
+                class="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-xl transition">
+
+                <div class="relative">
+
+                    {% if post.image %}
+                    <img src="{{ post.image.url }}"
+                        class="w-full h-28 sm:h-40 object-cover"
+                        alt="{{ post.title }}">
+                    {% if post.updated_at|date:"U" != post.created_at|date:"U"%}
+                    <span
+                        class="absolute bottom-2 left-2 z-10
+
+                        flex items-center gap-1.5
+
+                        bg-gradient-to-r from-amber-400/90 to-yellow-500/90
+                        text-white
+
+                        text-[10px] sm:text-xs
+                        font-extrabold tracking-wide
+
+                        px-2.5 py-1
+
+                        rounded-full
+                        border border-white/30
+
+                        shadow-lg shadow-black/30
+                        backdrop-blur-md
+
+                        transition-all duration-300
+                        hover:scale-105
+
+                        leading-none">
+                        • Edited
+                    </span>
+                    {% endif %}
+                    <div
+                        class="absolute top-3 right-3 bg-black/70 text-white rounded-full px-3 py-1 text-xs flex items-center gap-1">
+
+                        <svg width="30px" height="30px"
+                            viewBox="-2.4 -2.4 28.80 28.80"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"><g
+                                id="SVGRepo_bgCarrier"
+                                stroke-width="0"><path
+                                    transform="translate(-2.4, -2.4), scale(0.8999999999999999)"
+                                    d="M16,27.117480158217642C18.483364911923093,27.266007998897354,20.42549450363644,30.89473197004894,22.763575869387424,30.04471001012333C24.98377153781817,29.23754602466824,24.094379431691312,25.476604005208795,25.575542711400153,23.636240496448487C27.066018898921175,21.784305585714616,31.55572584917887,21.84290374959289,31.263266067766402,19.483740877848287C30.900339231243247,16.556146821154368,26.34830520603982,16.292255626243396,24.391461524420762,14.084703666454942C23.50085238177209,13.079990833883206,23.622967701525646,11.561692905762916,23.132889211254327,10.311710668178275C22.49031641136203,8.672780165891341,22.331020586855445,6.731579870691473,21.039521183828256,5.535326433301076C19.711697107041942,4.305427207345401,17.78188336197914,4.022130851825848,16,3.704860353352208C14.01053114950963,3.350628540338485,11.815117229317147,2.653866571069934,10.015185858665717,3.5724053810106593C8.211626281443262,4.492795732960323,7.755451937595421,6.840810839650338,6.59855243910949,8.502595753216431C5.512334548611136,10.062852720773325,3.563338411889657,11.226044184028304,3.370209393234429,13.117332711091743C3.1744679445746398,15.03420444118592,4.674873819550452,16.68046115030784,5.590335625685393,18.37593796402893C6.33469624117051,19.75452760714087,7.716158757398245,20.70331387704557,8.259621512090074,22.172745863985984C9.104352276333625,24.456755935726697,7.562925184745197,27.947315271510814,9.615132799508096,29.25831335609434C11.53083795654092,30.48211048725691,13.730818129612867,26.981762414240517,16,27.117480158217642"
+                                    fill="#5e58ff"
+                                    strokewidth="0"></path></g><g
+                                id="SVGRepo_tracerCarrier"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"></g><g
+                                id="SVGRepo_iconCarrier">
+                                <path
+                                    d="M6.03954 7.77203C3.57986 8.32856 2.35002 8.60682 2.05742 9.54773C1.76482 10.4886 2.60325 11.4691 4.2801 13.4299L4.71392 13.9372C5.19043 14.4944 5.42868 14.773 5.53586 15.1177C5.64305 15.4624 5.60703 15.8341 5.53498 16.5776L5.4694 17.2544C5.21588 19.8706 5.08912 21.1787 5.85515 21.7602C6.62118 22.3417 7.77268 21.8115 10.0757 20.7512L10.6715 20.4768C11.3259 20.1755 11.6531 20.0248 12 20.0248C12.3469 20.0248 12.6741 20.1755 13.3285 20.4768L13.9243 20.7512C16.2273 21.8115 17.3788 22.3417 18.1449 21.7602C18.9109 21.1787 18.7841 19.8706 18.5306 17.2544M19.7199 13.4299C21.3968 11.4691 22.2352 10.4886 21.9426 9.54773C21.65 8.60682 20.4201 8.32856 17.9605 7.77203L17.3241 7.62805C16.6251 7.4699 16.2757 7.39083 15.9951 7.17781C15.7144 6.96479 15.5345 6.64193 15.1745 5.99623L14.8468 5.40837C13.5802 3.13612 12.9469 2 12 2C11.0531 2 10.4198 3.13613 9.15316 5.40838"
+                                    stroke="#f5f541" stroke-width="1.5"
+                                    stroke-linecap="round"></path>
+                            </g></svg>
+
+                        {% if post.avg_rating %}
+                        <span class="font-bold text-yellow-300">
+                            {{ post.avg_rating|floatformat:1 }}
+                        </span>
+                        {% else %}
+                        <span class="text-gray-300">Not rated</span>
+                        {% endif %}
+
+                    </div>
+                    {% endif %}
+
+                </div>
+
+                <div class="p-2 sm:p-3">
+                    <div class="p-2 sm:p-3 relative group">
+
+                        {% if request.user == post.author %}
+                        <a href="{% url 'edit_post' post.id %}"
+                            class="absolute top-2 right-2 z-10
+
+               flex items-center justify-center
+
+               w-7 h-7 sm:w-9 sm:h-9
+               text-xs sm:text-sm
+
+               bg-white/90 backdrop-blur
+               shadow-md border border-gray-200
+               text-blue-500 rounded-full
+
+               transition-all duration-200
+               hover:scale-110 hover:rotate-6
+               active:scale-95"
+                            title="Edit post">
+
+                            ✏️
+                        </a>
+                        {% endif %}
+
+                    </div>
+
+                    <p
+                        class="text-[10px] sm:text-xs text-gray-400 uppercase font-bold truncate">
+                        {{ post.category }}
+                    </p>
+
+                    <h2
+                        class="text-sm sm:text-base font-bold mt-1 truncate">
+                        {{ post.title }}
+                    </h2>
+
+                    <p
+                        class="text-gray-600 text-[10px] sm:text-xs mt-1 line-clamp-2">
+                        {{ post.short_description|truncatechars:60 }}
+                    </p>
+
+                    <p
+                        class="text-[10px] text-gray-400 mt-1 hidden sm:block">
+                        {{ post.created_at|date:"M d, Y" }}
+                    </p>
+
+                    <div class="flex justify-between items-center mt-2">
+
+                        <a href="{% url 'post_detail' post.id %}"
+                            class="bg-yellow-400 hover:bg-yellow-500 px-2 py-1 text-[10px] sm:text-xs font-bold uppercase rounded transition">
+                            Read
+                        </a>
+
+                        {% if request.user == post.author %}
+
+                        <a href="{% url 'delete_post' post.id %}"
+                            onclick="return confirm('⚠ This post will be deleted forever!')"
+                            class="group relative text-red-500 hover:text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded overflow-hidden transition">
+
+                            <span
+                                class="absolute inset-0 bg-red-500 scale-x-0 group-hover:scale-x-100 transition origin-left"></span>
+
+                            <span class="relative z-10">
+                                🗑
+                            </span>
+                            <span class="relative z-10">
+                                Delete
+                            </span>
+
+                        </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+    
+
+let currentSlide = 0;
+
+function moveSlide(direction) {
+    const track = document.getElementById("track");
+
+    if (!track) return;
+
+    const items = track.children;
+    const total = items.length;
+
+    if (total === 0) return;
+
+    const item = items[0];
+    const width = item.offsetWidth;
+
+    currentSlide += direction;
+
+    if (currentSlide < 0) currentSlide = 0;
+    if (currentSlide > total - 1) currentSlide = total - 1;
+
+    track.style.transform = `translateX(-${currentSlide * width}px)`;
+    track.style.transition = "transform 0.5s ease";
+}
+document.addEventListener("DOMContentLoaded", () => {
+    const avatarInput = document.getElementById("avatarInput");
+    const avatarBtn = document.getElementById("avatarBtn");
+    const avatarPrev = document.getElementById("avatarPreview");
+
+    avatarInput?.addEventListener("change", () => {
+        const file = avatarInput.files[0];
+        if(file){
+            avatarPrev.src = URL.createObjectURL(file);
+        }
+    })
+})
+
+
+function getCookie(name) {
+
+    let cookieValue = null;
+
+    if (document.cookie && document.cookie !== "") {
+
+        document.cookie.split(";").forEach(cookie => {
+
+            cookie = cookie.trim();
+
+            if (cookie.startsWith(name + "=")) {
+
+                cookieValue = decodeURIComponent(
+                    cookie.substring(name.length + 1)
+                );
+
+            }
+
+        });
+
+    }
+
+    return cookieValue;
+}
+
+
+
+document.querySelectorAll(".like-btn").forEach(btn => {
+
+    btn.addEventListener("click", function () {
+
+        const postId = this.dataset.id;
+
+        const heart = this.querySelector(".heart-path");
+
+        const card = this.closest(".post-card");
+        fetch(`/like/${postId}/`, {
+            method: "GET",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            console.log(data);
+
+            if (data.liked) {
+
+                heart.setAttribute("fill", "#ef4444");
+
+            } else {
+
+                heart.setAttribute("fill", "#9ca3af");
+
+                // ВИДАЛЕННЯ КАРТКИ
+                if (card) {
+
+                    card.remove();
+
+                }
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error("ERROR:", error);
+
+        });
+
+    });
+
+});
+
+
+
+document.querySelectorAll(".save-btn").forEach(btn => {
+
+    btn.addEventListener("click", function () {
+
+        const postId = this.dataset.id;
+
+        const card = this.closest(".post-card");
+
+        const svg = this.querySelector("svg");
+
+        fetch(`/save/${postId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken"),
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        })
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            console.log(data);
+
+            if (data.saved) {
+
+                svg.setAttribute("fill", "#facc15");
+                svg.setAttribute("stroke", "#facc15");
+
+            } else {
+
+                svg.setAttribute("fill", "#ffffff");
+                svg.setAttribute("stroke", "#9ca3af");
+
+                // ВИДАЛЕННЯ
+                if (card) {
+
+                    card.remove();
+
+                }
+
+            }
+
+        })
+
+        .catch(error => {
+
+            console.error("ERROR:", error);
+
+        });
+
+    });
+
+});
+
+
+/* ================= TABS ================= */
+const likedBtn = document.getElementById("likedBtn");
+
+const savedBtn = document.getElementById("savedBtn");
+
+const likedPosts = document.getElementById("likedPosts");
+
+const savedPosts = document.getElementById("savedPosts");
+
+
+if (likedBtn && savedBtn) {
+
+    likedBtn.addEventListener("click", () => {
+
+        likedPosts.classList.remove("hidden");
+
+        savedPosts.classList.add("hidden");
+
+        likedBtn.classList.add("scale-105");
+
+        savedBtn.classList.remove("scale-105");
+
+    });
+
+
+    savedBtn.addEventListener("click", () => {
+
+        savedPosts.classList.remove("hidden");
+
+        likedPosts.classList.add("hidden");
+
+        savedBtn.classList.add("scale-105");
+
+        likedBtn.classList.remove("scale-105");
+
+    });
+
+}
+
+//editProf
+let oldAvatar = document.getElementById("avatarPreview")?.src;
+
+function enableEdit() {
+    document.getElementById("usernameEdit").classList.remove("hidden");
+    document.getElementById("emailEdit").classList.remove("hidden");
+    document.getElementById("bioEdit").classList.remove("hidden");
+
+    document.getElementById("bioText").classList.add("hidden");
+    document.getElementById("emailText").classList.add("hidden");
+
+    document.getElementById("actionButtons").classList.remove("hidden");
+
+    const cameraBtn = document.getElementById("cameraBtn");
+    if (cameraBtn) {
+        cameraBtn.classList.remove("hidden");
+    }
+}
+
+function cancelEdit() {
+    document.getElementById("usernameEdit").classList.add("hidden");
+    document.getElementById("emailEdit").classList.add("hidden");
+    document.getElementById("bioEdit").classList.add("hidden");
+
+    document.getElementById("bioText").classList.remove("hidden");
+    document.getElementById("emailText").classList.remove("hidden");
+
+    document.getElementById("actionButtons").classList.add("hidden");
+
+    const cameraBtn = document.getElementById("cameraBtn");
+    if (cameraBtn) {
+        cameraBtn.classList.add("hidden");
+    }
+
+    const avatarInput = document.getElementById("avatarInput");
+    const avatarPreview = document.getElementById("avatarPreview");
+
+    if (avatarInput) avatarInput.value = "";
+
+    if (avatarPreview && oldAvatar) {
+        avatarPreview.src = oldAvatar;
+    }
+}
+
+document.getElementById("avatarInput")?.addEventListener("change", function () {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const img = document.getElementById("avatarPreview");
+            const text = document.getElementById("avatarText");
+
+            img.src = e.target.result;
+            img.classList.remove("hidden");
+
+            if (text) text.classList.add("hidden");
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+//socialModal
+const socialModal = document.getElementById("socialModal");
+
+const openSocialModal =
+    document.getElementById("openSocialModal");
+
+const closeSocialModal =
+    document.getElementById("closeSocialModal");
+
+const socialSelect =
+    document.getElementById("socialSelect");
+
+const socialInput =
+    document.getElementById("socialInput");
+
+const saveSocialBtn =
+    document.getElementById("saveSocialBtn");
+
+function loadCurrentUrl() {
+
+    const selected =
+        socialSelect.options[socialSelect.selectedIndex];
+
+    socialInput.value =
+        selected.dataset.url || "";
+}
+
+socialSelect.addEventListener(
+    "change",
+    loadCurrentUrl
+);
+
+openSocialModal?.addEventListener("click", () => {
+
+    socialModal.classList.remove("hidden");
+
+    loadCurrentUrl();
+});
+
+closeSocialModal?.addEventListener("click", () => {
+
+    socialModal.classList.add("hidden");
+});
+
+saveSocialBtn?.addEventListener("click", () => {
+
+    const field = socialSelect.value;
+
+const url = socialInput.value.trim();
+
+
+
+// ERROR BLOCK
+let socialError =
+    document.getElementById("socialError");
+
+if (!socialError) {
+
+    socialError = document.createElement("p");
+
+    socialError.id = "socialError";
+
+    socialError.className =
+        "text-red-500 text-sm mt-2";
+
+    socialInput.parentElement.appendChild(
+        socialError
+    );
+}
+
+socialError.textContent = "";
+if (url === "") {
+
+    socialError.textContent =
+        "URL cannot be empty";
+
+    return;
+}
+
+   // VALIDATE URL
+if (url !== "") {
+
+    try {
+
+        const parsed = new URL(url);
+
+        // only http/https
+        if (
+            parsed.protocol !== "http:" &&
+            parsed.protocol !== "https:"
+        ) {
+            throw new Error();
+        }
+
+        const hostname =
+            parsed.hostname.replace("www.", "");
+
+        const rules = {
+
+            website: [],
+
+            instagram_url: [
+                "instagram.com"
+            ],
+
+            facebook_url: [
+                "facebook.com",
+                "fb.com"
+            ],
+
+            telegram_url: [
+                "t.me",
+                "telegram.me"
+            ],
+
+            youtube_url: [
+                "youtube.com",
+                "youtu.be"
+            ],
+
+            tiktok_url: [
+                "tiktok.com"
+            ],
+
+            twitter_url: [
+                "twitter.com",
+                "x.com"
+            ],
+
+            discord_url: [
+                "discord.gg",
+                "discord.com"
+            ],
+
+            twitch_url: [
+                "twitch.tv"
+            ],
+
+            sponsorship_url: [
+                "send.monobank.ua",
+                "mono.bank",
+                "buymeacoffee.com",
+                "patreon.com",
+                "donatello.to",
+                "paypal.com"
+            ]
+
+        };
+
+        // CHECK DOMAIN
+        if (
+            rules[field].length > 0 &&
+            !rules[field].some(domain =>
+                hostname.includes(domain)
+            )
+        ) {
+
+            socialError.textContent =
+                "Wrong platform URL";
+
+            return;
+        }
+
+    } catch {
+
+        socialError.textContent =
+            "Enter valid URL";
+
+        return;
+    }
+}
+
+    fetch("/save-social-link/", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken")
+        },
+
+        body: JSON.stringify({
+            field: field,
+            url: url
+        })
+
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        if (data.success) {
+
+            // UPDATE SELECT DATA
+            const selected =
+                socialSelect.options[
+                    socialSelect.selectedIndex
+                ];
+
+            selected.dataset.url = url;
+
+            // UPDATE LINKS UI
+            renderSocialLinks(data.links);
+
+            // CLOSE MODAL
+            socialModal.classList.add("hidden");
+
+            // CLEAR ERROR
+            socialError.textContent = "";
+        }
+
+    })
+
+    .catch(error => {
+
+        console.error(error);
+
+    });
+
+});
+
+function renderSocialLinks(links) {
+
+    let wrapper =
+        document.getElementById("socialLinksWrapper");
+
+    // CREATE BLOCK IF NOT EXISTS
+    if (!wrapper) {
+
+        const bioSection =
+            document.getElementById("bioText")
+            ?.parentElement;
+
+        wrapper = document.createElement("div");
+
+        wrapper.id = "socialLinksWrapper";
+
+        wrapper.className = "mt-4 border-t pt-4";
+
+        wrapper.innerHTML = `
+            <h3 class="font-bold text-lg mb-3">
+                Social Links
+            </h3>
+
+            <div id="socialLinksContainer"
+                class="flex flex-wrap gap-2">
+            </div>
+        `;
+
+        bioSection.appendChild(wrapper);
+    }
+
+    const container =
+        document.getElementById(
+            "socialLinksContainer"
+        );
+
+    container.innerHTML = "";
+
+    const socials = [
+        ["website", "🌐 Website"],
+        ["instagram_url", "📷 Instagram"],
+        ["facebook_url", "👍 Facebook"],
+        ["telegram_url", "✈️ Telegram"],
+        ["youtube_url", "▶️ YouTube"],
+        ["tiktok_url", "🎵 TikTok"],
+        ["twitter_url", "𝕏 Twitter"],
+        ["discord_url", "💬 Discord"],
+        ["twitch_url", "🎮 Twitch"],
+        ["sponsorship_url", "💰 Sponsorship"]
+    ];
+
+    let hasLinks = false;
+
+    socials.forEach(([key, label]) => {
+
+        if (links[key]) {
+
+            hasLinks = true;
+
+            container.innerHTML += `
+                <a href="${links[key]}"
+                    target="_blank"
+                    class="px-3 py-2 bg-gray-100 rounded hover:bg-gray-200 transition">
+                    ${label}
+                </a>
+            `;
+        }
+
+    });
+
+    // REMOVE BLOCK IF EMPTY
+    if (!hasLinks) {
+
+        wrapper.remove();
+
+    }
+
+}
+</script>
+{% endblock %}

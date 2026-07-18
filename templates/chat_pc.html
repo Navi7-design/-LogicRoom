@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud AI Assistant</title>
+    <!-- Підключаємо Tailwind CSS для стилів -->
+    <script src="https://tailwindcss.com"></script>
+    <!-- Підключаем Lucide Icons для іконок -->
+    <script src="https://unpkg.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-100 flex font-sans antialiased text-gray-900">
+
+    <!-- Sidebar (Бічна панель) -->
+    <aside class="w-80 bg-white/70 backdrop-blur-2xl border-r border-gray-200 p-6 flex flex-col shadow-xl">
+        <h1 class="text-3xl font-bold tracking-tight">Cloud AI</h1>
+        <p class="text-gray-500 mt-1">AI Assistant для cloud-pc.tech</p>
+
+        <div class="mt-8 space-y-3">
+            <button onclick="createNewChat()" class="w-full flex items-center justify-center gap-2 rounded-2xl bg-blue-600 text-white py-3 font-medium shadow-lg hover:scale-[1.02] transition">
+                <i data-lucide="plus" class="w-5 h-5"></i> Новий чат
+            </button>
+
+            <button onclick="clearCurrentChat()" class="w-full flex items-center justify-center gap-2 rounded-2xl bg-white border py-3 font-medium hover:shadow transition">
+                <i data-lucide="trash-2" class="w-5 h-5"></i> Очистити
+            </button>
+        </div>
+
+        <!-- Chat History -->
+        <div class="mt-6 flex-1 overflow-y-auto space-y-2">
+            <p class="text-sm text-gray-500 mb-2">Історія чатів</p>
+            <div id="chat-list" class="space-y-2">
+                <!-- Сюди JavaScript буде додавати список чатів -->
+            </div>
+        </div>
+
+        <div class="mt-auto p-5 rounded-3xl bg-white shadow-md border">
+            <p class="text-sm text-gray-500">Статус</p>
+            <p class="font-bold text-green-600">AI Online</p>
+        </div>
+    </aside>
+
+    <!-- Main Content (Вікно чату) -->
+    <main class="flex-1 flex flex-col h-screen">
+        <header class="h-20 bg-white/70 backdrop-blur-xl border-b px-8 flex items-center justify-between flex-shrink-0">
+            <div>
+                <h2 class="text-2xl font-bold">AI Assistant</h2>
+                <p class="text-gray-500 text-sm">Спілкуйтесь із ШІ прямо на сайті</p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 shadow-lg"></div>
+        </header>
+
+        <!-- Messages Area -->
+        <section id="messages-container" class="flex-1 overflow-y-auto px-8 py-6 space-y-6">
+            <!-- Сюди JavaScript буде додавати повідомлення -->
+            <div id="loading-indicator" class="hidden flex justify-start">
+                <div class="bg-white px-6 py-4 rounded-3xl shadow-md animate-pulse text-gray-500 flex items-center gap-2">
+                    <i data-lucide="bot" class="w-5 h-5 animate-spin"></i> Cloud AI думає...
+                </div>
+            </div>
+            <div id="messages-bottom"></div>
+        </section>
+
+        <!-- Input Footer -->
+        <footer class="p-6 bg-white/70 backdrop-blur-xl border-t flex-shrink-0">
+            <div class="max-w-5xl mx-auto flex items-center gap-4 bg-white rounded-full shadow-xl px-5 py-3 border">
+                <input
+                    type="text"
+                    id="message-input"
+                    placeholder="Напишіть повідомлення..."
+                    class="flex-1 outline-none bg-transparent text-lg px-2"
+                />
+                <button
+                    id="send-button"
+                    onclick="sendMessage()"
+                    class="p-4 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg hover:scale-105 transition disabled:opacity-50 disabled:scale-100"
+                >
+                    <i data-lucide="send" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Логіка роботи на чистому JavaScript -->
+    <script>
+        // Ініціалізація даних із localStorage
+        let chats = JSON.parse(localStorage.getItem("cloud-ai-chats")) || [{
+            id: Date.now(),
+            title: "Новий чат",
+            messages: [{
+                id: "init",
+                role: "assistant",
+                text: "Привіт! Я AI Assistant Cloud-PC. Чим можу допомогти?"
+            }]
+        }];
+        
+        let currentChatId = chats[0]?.id || Date.now();
+        let loading = false;
+
+        // Елементи DOM
+        const chatListContainer = document.getElementById("chat-list");
+        const messagesContainer = document.getElementById("messages-container");
+        const loadingIndicator = document.getElementById("loading-indicator");
+        const messageInput = document.getElementById("message-input");
+        const sendButton = document.getElementById("send-button");
+        const messagesBottom = document.getElementById("messages-bottom");
+
+        // Збереження в LocalStorage
+        function saveChats() {
+            localStorage.setItem("cloud-ai-chats", JSON.stringify(chats));
+        }
+
+        // Рендеринг списку чатів у сайдбарі
+        function renderChatList() {
+            chatListContainer.innerHTML = "";
+            chats.forEach(chat => {
+                const button = document.createElement("button");
+                button.onclick = () => selectChat(chat.id);
+                button.className = `w-full text-left px-4 py-3 rounded-2xl flex items-center gap-3 transition ${
+                    currentChatId === chat.id ? "bg-blue-100 border border-blue-300" : "bg-white hover:shadow"
+                }`;
+                
+                button.innerHTML = `
+                    <i data-lucide="message-square" class="w-5 h-5 flex-shrink-0 text-gray-500"></i>
+                    <span class="truncate font-medium">${chat.title}</span>
+                `;
+                chatListContainer.appendChild(button);
+            });
+            lucide.createIcons(); // Оновлюємо іконки Lucide
+        }
+
+        // Рендеринг повідомлень поточного чату
+        function renderMessages() {
+            const oldMessages = messagesContainer.querySelectorAll('.message-bubble');
+            oldMessages.forEach(el => el.remove());
+
+            const currentChat = chats.find(c => c.id === currentChatId) || chats[0];
+            
+            if (!currentChat) return;
+
+            currentChat.messages.forEach(msg => {
+                const wrapper = document.createElement("div");
+                wrapper.className = `flex message-bubble ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`;
+
+                const isUser = msg.role === 'user';
+                wrapper.innerHTML = `
+                    <div class="max-w-2xl px-6 py-4 rounded-3xl shadow-md flex gap-3 ${isUser ? 'bg-blue-600 text-white' : 'bg-white text-gray-900'}">
+                        <i data-lucide="${isUser ? 'user' : 'bot'}" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                        <p class="whitespace-pre-wrap">${msg.text}</p>
+                    </div>
+                `;
+                messagesContainer.insertBefore(wrapper, loadingIndicator);
+            });
+
+            lucide.createIcons();
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            messagesBottom.scrollIntoView({ behavior: "smooth" });
+        }
+
+        function selectChat(id) {
+            currentChatId = id;
+            renderChatList();
+            renderMessages();
+        }
+
+        function createNewChat() {
+            const newChat = {
+                id: Date.now(),
+                title: "Новий чат",
+                messages: [{
+                    id: String(Date.now()),
+                    role: "assistant",
+                    text: "Привіт! Я AI Assistant Cloud-PC. Чим можу допомогти?"
+                }]
+            };
+            chats.unshift(newChat);
+            currentChatId = newChat.id;
+            saveChats();
+            renderChatList();
+            renderMessages();
+        }
+
+        function clearCurrentChat() {
+            chats = chats.map(chat => chat.id === currentChatId ? {
+                ...chat,
+                messages: [{
+                    id: String(Date.now()),
+                    role: "assistant",
+                    text: "Чат очищено. Чим можу допомогти?"
+                }]
+            } : chat);
+            saveChats();
+            renderMessages();
+        }
+
+        async function sendMessage() {
+    const text = messageInput.value.trim();
+    if (!text || loading) return;
+
+    const currentChat = chats.find(c => c.id === currentChatId);
+    if (!currentChat) return;
+
+    const userMessage = { id: `user-${Date.now()}`, role: "user", text };
+    currentChat.messages.push(userMessage);
+
+    if (currentChat.title === "Новий чат") {
+        currentChat.title = text.slice(0, 20) + "...";
+    }
+
+    messageInput.value = "";
+    saveChats();
+    renderChatList();
+    renderMessages();
+
+    loading = true;
+    loadingIndicator.classList.remove("hidden");
+    messageInput.disabled = true;
+    sendButton.disabled = true;
+
+    try {
+        const response = await fetch("/api/chat/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                message: text,
+                history: currentChat.messages.map(m => ({
+                    role: m.role,
+                    text: m.text
+                }))
+            })
+        });
+
+        const data = await response.json();
+
+        currentChat.messages.push({
+            id: `ai-${Date.now()}`,
+            role: "assistant",
+            text: data.reply || "Помилка відповіді AI"
+        });
+
+    } catch (error) {
+        currentChat.messages.push({
+            id: `error-${Date.now()}`,
+            role: "assistant",
+            text: "Помилка підключення до AI сервера."
+        });
+    }
+
+    loading = false;
+    loadingIndicator.classList.add("hidden");
+    messageInput.disabled = false;
+    sendButton.disabled = false;
+
+    saveChats();
+    renderChatList();
+    renderMessages();
+    scrollToBottom();
+}
+                    
+
+</script>
+
+            </body>
+        </html>

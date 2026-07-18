@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-gray-100">
+    <div class="max-w-4xl mx-auto mt-10 px-4">
+        <div class="bg-white p-8 rounded-2xl shadow-xl">
+
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">
+
+                {% if is_edit %}
+                ✏️ Edit Post
+                {% else %}
+                ✍️ Create Post
+                {% endif %}
+
+            </h2>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-6">
+                {% csrf_token %}
+
+                <div class="{% if form.title.errors %}error-field{% endif %}">
+                    <label
+                        class="block text-gray-700 font-semibold mb-2">
+                        Title
+                    </label>
+                    {{ form.title }}
+                    {% if form.title.errors %}
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ form.title.errors.0}}</p>
+                    {% endif %}
+                </div>
+
+                <div
+                    class="{% if form.category.errors %}error-field{% endif %}">
+                    <label
+                        class="block text-gray-700 font-semibold mb-2">
+                        Category
+                    </label>
+                    {{ form.category }}
+                    {% if form.category.errors %}
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ form.category.errors.0}}</p>
+                    {% endif %}
+                </div>
+
+                <div
+                    class="{% if form.short_description.errors %}error-field{% endif %}">
+                    <label
+                        class="block text-gray-700 font-semibold mb-2">
+                        Short description
+                    </label>
+                    {{form.short_description}}
+                    {% if form.short_description.errors %}
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ form.short_description.errors.0}}</p>
+                    {% endif %}
+                </div>
+
+                <div class="{% if form.image.errors %}error-field{% endif %}">
+                    <label
+                        class="block text-gray-700 font-semibold mb-2">
+                        Image
+                    </label>
+                    {{ form.image }}
+                    {% if form.image.errors %}
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ form.image.errors.0}}</p>
+                    {% endif %}
+                </div>
+
+                <div class="{% if form.content.errors %}error-field{% endif %}">
+                    <label
+                        class="block text-gray-700 font-semibold mb-2">
+                        Content
+                    </label>
+                    {{ form.content }}
+                    {% if form.content.errors %}
+                    <p class="text-red-500 text-sm mt-1">
+                        {{ form.content.errors.0}}</p>
+                    {% endif %}
+
+                </div>
+
+                <div class="text-center pt-6 space-y-3">
+
+                    <button type="submit"
+                        class="bg-gradient-to-r from-yellow-300 to-yellow-900 text-white font-semibold px-8 py-3 rounded-xl 
+        hover:scale-105 hover:shadow-lg transition duration-300">
+
+                        {% if is_edit %}
+                        💾 Save changes
+                        {% else %}
+                        🚀 Create
+                        {% endif %}
+
+                    </button>
+
+                    {% if is_edit %}
+                    <div>
+                        <a href="{% url 'profile' request.user.username %}"
+                            class="inline-block text-gray-500 hover:text-red-500 text-sm transition">
+                            ❌ Cancel and go back
+                        </a>
+                    </div>
+                    {% endif %}
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const burgerBtn = document.querySelector("#burgerBtn");
+        const mobileMenu = document.querySelector("#mobileMenu");
+
+        burgerBtn.addEventListener("click", () => {
+            mobileMenu.classList.toggle("hidden");
+            burgerBtn.classList.toggle("active")
+        });
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+    const errorField = document.querySelector(".error-field");
+
+    if (errorField) {
+        errorField.scrollIntoView({
+            behavior: "smooth",
+            block: "center"
+        });
+    }
+});
+</script>
+    {% endblock %}

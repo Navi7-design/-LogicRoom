@@ -1,0 +1,669 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen py-10">
+
+    <div
+        class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+
+        <div class="relative">
+
+            {% if post.image %}
+            <img src="{{ post.image.url }}"
+                class="w-full h-64 object-cover rounded-sm shadow-sm"
+                alt="{{ post.title }}">
+            <div
+                class="absolute top-2 right-4 bg-black/60 rounded-full p-2 flex items-center gap-1">
+                <div class=" text-green-600">
+                    {{ rating_count }} Evaluations</div>
+            </div>
+
+            <div
+                class="absolute bottom-4 right-4 bg-black/60 rounded-full p-2 flex items-center gap-1">
+
+                <svg width="30px" height="30px" viewBox="-2.4 -2.4 28.80 28.80"
+                    fill="none" xmlns="http://www.w3.org/2000/svg"><g
+                        id="SVGRepo_bgCarrier" stroke-width="0"><path
+                            transform="translate(-2.4, -2.4), scale(0.8999999999999999)"
+                            d="M16,27.117480158217642C18.483364911923093,27.266007998897354,20.42549450363644,30.89473197004894,22.763575869387424,30.04471001012333C24.98377153781817,29.23754602466824,24.094379431691312,25.476604005208795,25.575542711400153,23.636240496448487C27.066018898921175,21.784305585714616,31.55572584917887,21.84290374959289,31.263266067766402,19.483740877848287C30.900339231243247,16.556146821154368,26.34830520603982,16.292255626243396,24.391461524420762,14.084703666454942C23.50085238177209,13.079990833883206,23.622967701525646,11.561692905762916,23.132889211254327,10.311710668178275C22.49031641136203,8.672780165891341,22.331020586855445,6.731579870691473,21.039521183828256,5.535326433301076C19.711697107041942,4.305427207345401,17.78188336197914,4.022130851825848,16,3.704860353352208C14.01053114950963,3.350628540338485,11.815117229317147,2.653866571069934,10.015185858665717,3.5724053810106593C8.211626281443262,4.492795732960323,7.755451937595421,6.840810839650338,6.59855243910949,8.502595753216431C5.512334548611136,10.062852720773325,3.563338411889657,11.226044184028304,3.370209393234429,13.117332711091743C3.1744679445746398,15.03420444118592,4.674873819550452,16.68046115030784,5.590335625685393,18.37593796402893C6.33469624117051,19.75452760714087,7.716158757398245,20.70331387704557,8.259621512090074,22.172745863985984C9.104352276333625,24.456755935726697,7.562925184745197,27.947315271510814,9.615132799508096,29.25831335609434C11.53083795654092,30.48211048725691,13.730818129612867,26.981762414240517,16,27.117480158217642"
+                            fill="#5e58ff" strokewidth="0"></path></g><g
+                        id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                        stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier">
+                        <path
+                            d="M6.03954 7.77203C3.57986 8.32856 2.35002 8.60682 2.05742 9.54773C1.76482 10.4886 2.60325 11.4691 4.2801 13.4299L4.71392 13.9372C5.19043 14.4944 5.42868 14.773 5.53586 15.1177C5.64305 15.4624 5.60703 15.8341 5.53498 16.5776L5.4694 17.2544C5.21588 19.8706 5.08912 21.1787 5.85515 21.7602C6.62118 22.3417 7.77268 21.8115 10.0757 20.7512L10.6715 20.4768C11.3259 20.1755 11.6531 20.0248 12 20.0248C12.3469 20.0248 12.6741 20.1755 13.3285 20.4768L13.9243 20.7512C16.2273 21.8115 17.3788 22.3417 18.1449 21.7602C18.9109 21.1787 18.7841 19.8706 18.5306 17.2544M19.7199 13.4299C21.3968 11.4691 22.2352 10.4886 21.9426 9.54773C21.65 8.60682 20.4201 8.32856 17.9605 7.77203L17.3241 7.62805C16.6251 7.4699 16.2757 7.39083 15.9951 7.17781C15.7144 6.96479 15.5345 6.64193 15.1745 5.99623L14.8468 5.40837C13.5802 3.13612 12.9469 2 12 2C11.0531 2 10.4198 3.13613 9.15316 5.40838"
+                            stroke="#f5f541" stroke-width="1.5"
+                            stroke-linecap="round"></path> </g></svg>
+
+                <div class="text-xl text-yellow-300">
+                    {{ avg_rating|floatformat:1 }} / 5
+                </div>
+            </div>
+
+            {% endif %}
+        </div>
+
+        <div class="p-8">
+
+            <span
+                class="bg-blue-100 text-blue-600 text-xs font-semibold px-3 py-1 rounded-full">
+                {{ post.category }}
+            </span>
+
+            <h1 class="text-4xl font-bold mt-4 text-gray-800 leading-tight">
+                {{ post.title }}
+            </h1>
+
+            <div class="flex items-center gap-4 mt-6">
+
+                <a
+                    href="{% url 'profile' post.author.username %}"
+                    class="group w-12 h-12 rounded-full 
+           bg-gradient-to-br from-gray-800 via-gray-900 to-black
+           text-white flex items-center justify-center 
+           text-xl font-bold shadow-lg
+           transition-all duration-500
+           hover:rotate-[360deg]
+           hover:scale-110
+           hover:shadow-gray-700/60
+           hover:shadow-2xl
+           hover:from-gray-700
+           hover:to-gray-950">
+                    <span class="transition duration-300 group-hover:scale-125">
+
+                        <img class="w-10 h-10 rounded-full object-cover"
+                            src="{% if post.author.profile.avatar %}{{ post.author.profile.avatar.url }}{% else %}{% static 'avatar/default.png' %}{% endif %}"
+                            alt="Аватар">
+                    </span>
+
+                </a>
+
+                <div>
+                    <p class="font-semibold text-gray-700">
+                        {{ post.author.username }}
+                    </p>
+                    <p class="text-sm text-gray-400">
+                        {{ post.created_at|date:"d M Y" }}
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="mt-8 text-gray-700 text-lg leading-relaxed space-y-4">
+                {{ post.content|safe }}
+            </div>
+
+            <div class="mt-10 flex gap-4" id="rate">
+
+                <a href="{% url 'posts' %}"
+                    class="bg-gray-200 hover:bg-gray-300 px-5 py-2 rounded-lg transition">
+                    ← Back
+                </a>
+
+            </div>
+
+        </div>
+        <div class="mt-6 p-4 bg-gray-50 rounded-xl shadow-sm text-center">
+
+            {% if user_rating %}
+            <h4 class="text-gray-600 font-semibold mb-2">
+                Rate the post
+            </h4>
+            {% else %}
+            <h4 class="text-gray-700 font-semibold mb-2">
+                ⭐ Rate this post
+            </h4>
+            {% endif %}
+
+            <div class="flex justify-center gap-1 text-3xl">
+
+                {% for i in "12345" %}
+
+                {% if user.is_authenticated %}
+                {% url 'rate_post' post.id i as star_url %}
+                {% else %}
+                {% url 'login' as login_url %}
+                {% endif %}
+
+                <a
+                    href="{% if user.is_authenticated %}{{ star_url }}{% else %}{{ login_url }}?next={{ request.path }}{% endif %}"
+                    class="{% if i|add:'0' <= user_rating %}text-yellow-400{% else %}text-gray-300 hover:text-yellow-400{% endif %} hover:scale-110 transition">
+                    {% if i|add:"0" <= user_rating %}
+                    ★
+                    {% else %}
+                    ☆
+                    {% endif %}
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+        {% if user.is_authenticated %}
+        <div class="flex justify-center items-center gap-16 mt-8">
+
+            <!-- ❤️ LIKE -->
+            <div class="flex flex-col items-center">
+
+                <button
+                    class="like-btn transition duration-200 active:scale-90 hover:scale-110"
+                    data-id="{{ post.id }}">
+
+                    <svg class="w-16 h-16 drop-shadow-lg"
+                        viewBox="0 0 1024 1024"
+                        xmlns="http://www.w3.org/2000/svg">
+
+                        <path
+                            class="heart-path transition duration-300"
+                            d="M933.387 517.868C950.274 477.276 960 431.509 960 382.887c0-165.301-109.993-299.305-245.677-299.305-83.964 0-158.011 51.39-202.323 129.684-44.31-78.295-118.357-129.685-202.321-129.685C173.994 83.581 64 217.586 64 382.887c0 57.701 13.632 111.398 36.851 157.102 56.694 135.957 196.112 269.389 414.1 400.428 149.872-95.245 273.613-208.473 368.923-341.271 14.435-16.802 49.513-81.278 49.513-81.278z"
+                            fill="{% if user in post.likes.all %}#ef4444{% else %}#9ca3af{% endif %}" />
+
+                    </svg>
+
+                </button>
+
+                <span class="mt-2 text-lg font-semibold text-gray-600">
+                    Like
+                </span>
+
+            </div>
+
+            <!-- 📌 SAVE -->
+            <div class="flex flex-col items-center">
+
+                <button
+                    class="save-btn transition duration-200 active:scale-90 hover:scale-110"
+                    data-id="{{ post.id }}">
+
+                    <svg class="save-icon w-14 h-14 drop-shadow-lg"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="{% if user in post.saved_by.all %}#facc15{% else %}#ffffff{% endif %}"
+                        stroke="{% if user in post.saved_by.all %}#facc15{% else %}#9ca3af{% endif %}"
+                        stroke-width="2">
+
+                        <path
+                            d="M6 3H18a1 1 0 0 1 1 1V21l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+
+                    </svg>
+
+                </button>
+
+                <span class="mt-2 text-lg font-semibold text-gray-600">
+                    Save
+                </span>
+
+            </div>
+
+        </div>
+        {% else %}
+        <a href="{% url 'login' %}?next={{ request.path }}">
+            <div class="flex justify-center items-center gap-16 mt-8">
+
+                <!-- ❤️ LIKE -->
+                <div class="flex flex-col items-center">
+
+                    <button
+                        class="like-btn transition duration-200 active:scale-90 hover:scale-110"
+                        data-id="{{ post.id }}">
+
+                        <svg class="w-16 h-16 drop-shadow-lg"
+                            viewBox="0 0 1024 1024"
+                            xmlns="http://www.w3.org/2000/svg">
+
+                            <path
+                                class="heart-path transition duration-300"
+                                d="M933.387 517.868C950.274 477.276 960 431.509 960 382.887c0-165.301-109.993-299.305-245.677-299.305-83.964 0-158.011 51.39-202.323 129.684-44.31-78.295-118.357-129.685-202.321-129.685C173.994 83.581 64 217.586 64 382.887c0 57.701 13.632 111.398 36.851 157.102 56.694 135.957 196.112 269.389 414.1 400.428 149.872-95.245 273.613-208.473 368.923-341.271 14.435-16.802 49.513-81.278 49.513-81.278z"
+                                fill="{% if user in post.likes.all %}#ef4444{% else %}#9ca3af{% endif %}" />
+
+                        </svg>
+
+                    </button>
+
+                    <span class="mt-2 text-lg font-semibold text-gray-600">
+                        Like
+                    </span>
+
+                </div>
+
+                <!-- 📌 SAVE -->
+                <div class="flex flex-col items-center">
+
+                    <button
+                        class="save-btn transition duration-200 active:scale-90 hover:scale-110"
+                        data-id="{{ post.id }}">
+
+                        <svg class="save-icon w-14 h-14 drop-shadow-lg"
+                            viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="{% if user in post.saved_by.all %}#facc15{% else %}#ffffff{% endif %}"
+                            stroke="{% if user in post.saved_by.all %}#facc15{% else %}#9ca3af{% endif %}"
+                            stroke-width="2">
+
+                            <path
+                                d="M6 3H18a1 1 0 0 1 1 1V21l-7-4-7 4V4a1 1 0 0 1 1-1z" />
+
+                        </svg>
+
+                    </button>
+
+                    <span class="mt-2 text-lg font-semibold text-gray-600">
+                        Save
+                    </span>
+
+                </div>
+
+            </div>
+        </a>
+        {% endif %}
+        <h3 class="mt-8 ml-4 font-bold text-xl">Similar posts</h3>
+        {% if similar_posts %}
+        <div class="relative mt-4 overflow-hidden">
+
+            <button onclick="moveSlide(-1)"
+                class="absolute left-3 top-1/2 -translate-y-1/2 z-10
+               bg-white/80 hover:bg-white shadow-lg
+               rounded-full p-3 transition transform hover:scale-110">
+
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18l-6-6 6-6"
+                        stroke="black"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+
+            <div id="track"
+                class="flex transition-transform duration-500">
+
+                {% for post in similar_posts %}
+                <div class="min-w-full px-4">
+
+                    <div
+                        class="bg-white shadow-md rounded-lg p-4 mb-6 relative">
+
+                        <p
+                            class="text-sm text-gray-500 mb-3 uppercase font-bold tracking-wider">
+                            Category: {{ post.category }}
+                        </p>
+
+                        <div class="relative">
+
+                            {% if post.image %}
+                            <img src="{{ post.image.url }}"
+                                class="w-full h-64 object-cover rounded-sm shadow-sm"
+                                alt="{{ post.title }}">
+
+                            <div
+                                class="absolute top-3 right-3 bg-black/70 text-white rounded-full px-3 py-1 text-xs flex items-center gap-2">
+
+                                <svg width="30px" height="30px"
+                                    viewBox="-2.4 -2.4 28.80 28.80"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"><g
+                                        id="SVGRepo_bgCarrier"
+                                        stroke-width="0"><path
+                                            transform="translate(-2.4, -2.4), scale(0.8999999999999999)"
+                                            d="M16,27.117480158217642C18.483364911923093,27.266007998897354,20.42549450363644,30.89473197004894,22.763575869387424,30.04471001012333C24.98377153781817,29.23754602466824,24.094379431691312,25.476604005208795,25.575542711400153,23.636240496448487C27.066018898921175,21.784305585714616,31.55572584917887,21.84290374959289,31.263266067766402,19.483740877848287C30.900339231243247,16.556146821154368,26.34830520603982,16.292255626243396,24.391461524420762,14.084703666454942C23.50085238177209,13.079990833883206,23.622967701525646,11.561692905762916,23.132889211254327,10.311710668178275C22.49031641136203,8.672780165891341,22.331020586855445,6.731579870691473,21.039521183828256,5.535326433301076C19.711697107041942,4.305427207345401,17.78188336197914,4.022130851825848,16,3.704860353352208C14.01053114950963,3.350628540338485,11.815117229317147,2.653866571069934,10.015185858665717,3.5724053810106593C8.211626281443262,4.492795732960323,7.755451937595421,6.840810839650338,6.59855243910949,8.502595753216431C5.512334548611136,10.062852720773325,3.563338411889657,11.226044184028304,3.370209393234429,13.117332711091743C3.1744679445746398,15.03420444118592,4.674873819550452,16.68046115030784,5.590335625685393,18.37593796402893C6.33469624117051,19.75452760714087,7.716158757398245,20.70331387704557,8.259621512090074,22.172745863985984C9.104352276333625,24.456755935726697,7.562925184745197,27.947315271510814,9.615132799508096,29.25831335609434C11.53083795654092,30.48211048725691,13.730818129612867,26.981762414240517,16,27.117480158217642"
+                                            fill="#5e58ff"
+                                            strokewidth="0"></path></g><g
+                                        id="SVGRepo_tracerCarrier"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"></g><g
+                                        id="SVGRepo_iconCarrier">
+                                        <path
+                                            d="M6.03954 7.77203C3.57986 8.32856 2.35002 8.60682 2.05742 9.54773C1.76482 10.4886 2.60325 11.4691 4.2801 13.4299L4.71392 13.9372C5.19043 14.4944 5.42868 14.773 5.53586 15.1177C5.64305 15.4624 5.60703 15.8341 5.53498 16.5776L5.4694 17.2544C5.21588 19.8706 5.08912 21.1787 5.85515 21.7602C6.62118 22.3417 7.77268 21.8115 10.0757 20.7512L10.6715 20.4768C11.3259 20.1755 11.6531 20.0248 12 20.0248C12.3469 20.0248 12.6741 20.1755 13.3285 20.4768L13.9243 20.7512C16.2273 21.8115 17.3788 22.3417 18.1449 21.7602C18.9109 21.1787 18.7841 19.8706 18.5306 17.2544M19.7199 13.4299C21.3968 11.4691 22.2352 10.4886 21.9426 9.54773C21.65 8.60682 20.4201 8.32856 17.9605 7.77203L17.3241 7.62805C16.6251 7.4699 16.2757 7.39083 15.9951 7.17781C15.7144 6.96479 15.5345 6.64193 15.1745 5.99623L14.8468 5.40837C13.5802 3.13612 12.9469 2 12 2C11.0531 2 10.4198 3.13613 9.15316 5.40838"
+                                            stroke="#f5f541" stroke-width="1.5"
+                                            stroke-linecap="round"></path>
+                                    </g></svg>
+                                <div>
+                                    {% if post.rating_count > 0 %}
+                                    <div class="text-xl text-yellow-300">
+                                        {{ post.avg_rating|floatformat:1 }}
+                                    </div>
+                                    {% else %}
+                                    <span class="text-gray-500 text-sm">Not
+                                        rated</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            {% endif %}
+                        </div>
+
+                        <p class="text-xs text-gray-400 mt-3">
+                            By <span class="text-purple-700 font-bold">
+                                {{ post.author.username }}
+                            </span>
+                            | {{ post.created_at|date:"M d, Y" }}
+                        </p>
+
+                        <h2 class="text-xl font-bold mt-2">
+                            {{ post.title }}
+                        </h2>
+
+                        <p class="text-gray-600 text-sm mt-2">
+                            {{ post.short_description|truncatechars:120 }}
+                        </p>
+
+                        <a href="{% url 'post_detail' post.id %}"
+                            class="inline-block mt-3 bg-yellow-400 px-4 py-2 font-bold rounded">
+                            Read More >
+                        </a>
+
+                    </div>
+
+                </div>
+                {% endfor %}
+
+            </div>
+
+            <button onclick="moveSlide(1)"
+                class="absolute right-3 top-1/2 -translate-y-1/2 z-10
+               bg-white/80 hover:bg-white shadow-lg
+               rounded-full p-3 transition transform hover:scale-110">
+
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                    <path d="M9 6l6 6-6 6"
+                        stroke="black"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round" />
+                </svg>
+            </button>
+
+        </div>
+        {% else %}
+
+        <p class="text-gray-500 mt-4 ml-4">
+            No similar posts found.
+        </p>
+
+        {% endif %}
+        <h3 class="text-xl font-bold mb-3">💬 Add a Comment</h3>
+
+        <form method="POST" action="#comments"
+            class="bg-white p-4 rounded-xl shadow mb-6">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="bg-red-100 text-red-700 p-2 mb-3 rounded">
+                Please correct the errors.
+            </div>
+            {% endif %}
+
+            <textarea name="text" rows="3"
+                placeholder="Write something..."
+                class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-400
+        {% if form.text.errors %}border-red-500{% endif %}">{{ form.text.value|default_if_none:'' }}</textarea>
+
+            {% if form.text.errors %}
+            <div class="text-red-500 text-sm mt-1">
+                {% for error in form.text.errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% if user.is_authenticated %}
+            <button type="submit"
+                class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                Submit
+            </button>
+            {% else %}
+            <a href="{% url 'login' %}?next={{ request.path }}"
+                class="inline-block mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                Submit
+            </a>
+            {% endif %}
+
+        </form>
+        <h3 class="text-xl font-bold mb-3 ml-4">Comments</h3>
+        <div id="comments" class="space-y-5">
+
+            {% for comment in comments %}
+
+            <div
+                class="bg-white rounded-2xl shadow-md border border-gray-200 p-5 hover:shadow-lg transition">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between">
+
+                    <div class="flex items-center gap-3">
+
+                        <a href="{% url 'profile' comment.author.username %}"
+                            class="group">
+
+                            <img
+                                src="{% if comment.author.profile.avatar %}{{ comment.author.profile.avatar.url }}{% else %}{% static 'avatar/default.png' %}{% endif %}"
+                                class="w-12 h-12 rounded-full object-cover border-2 border-gray-300 transition group-hover:scale-105">
+
+                        </a>
+
+                        <div>
+
+                            <a
+                                href="{% url 'profile' comment.author.username %}"
+                                class="font-semibold text-gray-900 hover:text-blue-600 transition">
+
+                                {{ comment.author.username }}
+
+                            </a>
+
+                            <p class="text-xs text-gray-500">
+                                {{ comment.created_at|date:"d.m.Y • H:i" }}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="mt-4">
+                    <p class="text-gray-700 leading-relaxed break-all">
+                        {{ comment.text }}
+                    </p>
+                </div>
+                <div class="flex items-center gap-6 mt-5">
+
+                    <a href="{% url 'vote_comment' comment.id 1 %}#comments"
+                        class="flex items-center gap-1 text-green-600 hover:text-green-700 transition">
+
+                        👍
+                        <span>{{ comment.total_likes }}</span>
+
+                    </a>
+
+                    <a href="{% url 'vote_comment' comment.id -1 %}#comments"
+                        class="flex items-center gap-1 text-red-600 hover:text-red-700 transition">
+
+                        👎
+                        <span>{{ comment.total_dislikes }}</span>
+
+                    </a>
+
+                </div>
+
+                {% if request.user == comment.author %}
+
+                <div class="flex gap-3 mt-5">
+
+                    <button
+                        onclick="document.getElementById('edit-{{ comment.id }}').classList.toggle('hidden')"
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition shadow"
+                        action="{% url 'edit_comment' comment.id %}#comments">
+
+                        ✏️ Edit
+
+                    </button>
+
+                    <form method="POST"
+                        action="{% url 'delete_comment' comment.id %}#comments"
+                        onsubmit="return confirm('Delete this comment?');">
+
+                        {% csrf_token %}
+
+                        <button
+                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl transition shadow">
+
+                            🗑 Delete
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+                <form id="edit-{{ comment.id }}"
+                    method="POST"
+                    action="{% url 'edit_comment' comment.id %}#comments"
+                    class="hidden mt-5">
+
+                    {% csrf_token %}
+
+                    <textarea
+                        name="text"
+                        rows="4"
+                        class="w-full rounded-xl border border-gray-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                        required>{{ comment.text }}</textarea>
+
+                    <div class="flex gap-3 mt-3">
+
+                        <button
+                            class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-xl transition"
+                            action="{% url 'edit_comment' comment.id %}#comments">
+
+                            💾 Save
+
+                        </button>
+
+                        <button
+                            type="button"
+                            onclick="document.getElementById('edit-{{ comment.id }}').classList.add('hidden')"
+                            class="bg-gray-400 hover:bg-gray-500 text-white px-5 py-2 rounded-xl transition">
+
+                            Cancel
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+                {% endif %}
+
+            </div>
+
+            {% empty %}
+
+            <div class="bg-gray-100 rounded-2xl p-8 text-center text-gray-500">
+
+                💬 No comments yet.
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+let index = 0;
+
+function moveSlide(direction) {
+    const track = document.getElementById("track");
+    const items = track.children.length;
+
+    index += direction;
+
+    if (index < 0) index = 0;
+    if (index > items - 1) index = items - 1;
+
+    const offset = -(index * 100);
+    track.style.transform = `translateX(${offset}%)`;
+}
+if(window.location.hash === "#comments" || window.location.hash === "#rate"){
+        setTimeout(()=>{
+            document.getElementById("comments")?.scrollIntoView({behavior:"smooth", block:"start"})
+        }, 300)
+    }
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            cookie = cookie.trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+const csrftoken = getCookie("csrftoken");
+
+
+
+document.querySelectorAll(".like-btn, .save-btn").forEach(button => {
+
+    button.addEventListener("click", async function () {
+
+        const postId = this.dataset.id;
+
+        const isLike = this.classList.contains("like-btn");
+        const url = isLike ? `/like/${postId}/` : `/save/${postId}/`;
+
+        const res = await fetch(url, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken
+            }
+        });
+
+        const data = await res.json();
+
+
+        if (isLike) {
+
+            const path = this.querySelector(".heart-path");
+
+            if (data.liked) {
+                path.setAttribute("fill", "#ef4444"); 
+            } else {
+                path.setAttribute("fill", "#9ca3af"); 
+            }
+
+        }
+
+
+        else {
+
+            const icon = this.querySelector(".save-icon");
+
+            if (data.saved) {
+
+                icon.setAttribute("fill", "#facc15");
+                icon.setAttribute("stroke", "#facc15");
+
+            } else {
+
+                icon.setAttribute("fill", "#ffffff");
+                icon.setAttribute("stroke", "#9ca3af");
+
+            }
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

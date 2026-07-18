@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block head %}
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-gray-100 min-h-screen flex justify-center items-start pt-6 md:items-center md:pt-0">
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden
+        w-full max-w-md md:max-w-4xl grid md:grid-cols-2">
+
+        <!-- Картинка -->
+        <div class="w-full h-48 md:h-auto">
+            <img
+                src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f"
+                class="h-full w-full object-cover">
+        </div>
+
+        <!-- Форма -->
+        <div class="p-6">
+
+            <h2 class="text-2xl font-bold text-center mb-6">
+                Create Account
+            </h2>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                <!-- Username -->
+                <input type="text"
+                    name="{{ form.username.html_name }}"
+                    id="{{ form.username.id_for_label }}"
+                    value="{{ form.username.value|default:'' }}"
+                    placeholder="Username"
+                    reguire
+                    class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
+                    
+                {% if form.username.errors %}
+                    <p class="text-red-500 text-sm">
+                        {{ form.username.errors.0 }}
+                    </p>
+                {% endif %}
+
+                <!-- Email -->
+                <input type="email"
+                    name="{{ form.email.html_name }}"
+                    id="{{ form.email.id_for_label }}"
+                    value="{{ form.email.value|default:'' }}"
+                    placeholder="Email Address"
+                    reguire
+                    class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
+
+                {% if form.email.errors %}
+                    <p class="text-red-500 text-sm">
+                        {{ form.email.errors.0 }}
+                    </p>
+                {% endif %}
+
+                <!-- Password -->
+                <input type="password"
+                    name="{{ form.password1.html_name }}"
+                    id="{{ form.password1.id_for_label }}"
+                    placeholder="Password"
+                    reguire
+                    class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
+
+                {% if form.password1.errors %}
+                    <p class="text-red-500 text-sm">
+                        {{ form.password1.errors.0 }}
+                    </p>
+                {% endif %}
+
+                <!-- Confirm Password -->
+                <input type="password"
+                    name="{{ form.password2.html_name }}"
+                    id="{{ form.password2.id_for_label }}"
+                    placeholder="Confirm Password"
+                    reguire
+                    class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-yellow-400">
+
+                {% if form.password2.errors %}
+                    <p class="text-red-500 text-sm">
+                        {{ form.password2.errors.0 }}
+                    </p>
+                {% endif %}
+
+                <!-- Кнопка -->
+                <button type="submit"
+                    class="w-full bg-yellow-400 p-3 font-semibold rounded hover:bg-yellow-300 transition">
+                    Sign Up
+                </button>
+
+            </form>
+
+            <p class="text-sm text-center mt-4">
+                Already have an account?
+                <a href="{% url 'login' %}"
+                    class="text-yellow-500 font-semibold">Sign in</a>
+            </p>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

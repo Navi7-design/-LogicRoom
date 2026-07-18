@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+
+{% block content %}
+<form method="GET" >
+
+    <div class="max-w-3xl mx-auto mt-6">
+        <div class="flex  w-full my-2">
+            {% if request.GET.search|default:'' %}
+            <a
+                href="?category={{ request.GET.category }}"
+                class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white font-semibold rounded-md transition shadow">
+                <svg fill="#000000" width="20px" height="20px"
+                    viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><g
+                        id="SVGRepo_bgCarrier" stroke-width="0"></g><g
+                        id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                        stroke-linejoin="round"></g><g
+                        id="SVGRepo_iconCarrier"><path
+                            d="M7.004 23.087l7.08-7.081-7.07-7.071L8.929 7.02l7.067 7.069L23.084 7l1.912 1.913-7.089 7.093 7.075 7.077-1.912 1.913-7.074-7.073L8.917 25z"></path></g></svg>
+            </a>
+            {% endif %}
+            <input
+                type="text"
+                name="search"
+                id="search"
+                value="{{ request.GET.search|default:'' }}"
+                placeholder="Search what you are interested in here..."
+                class="py-2 px-3 bg-gray-300 rounded-md w-full outline-none">
+            <button type="submit"
+                class="bg-blue-500 text-white px-4 py-2 rounded">
+                Search
+            </button>
+
+        </div>
+    </form>
+    <div class="flex flex-wrap gap-2 mb-4">
+
+        <a href="{% url 'posts' %}"
+            class="px-4 py-2 rounded-full text-sm font-medium
+       {% if not active_category %}
+            bg-blue-600 text-white
+       {% else %}
+            bg-gray-200 text-gray-700 hover:bg-gray-300
+       {% endif %}">
+            All
+        </a>
+
+        {% for cat in categories %}
+
+        <a href="{% url 'posts_by_category' cat.slug %}"
+            class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium
+   {% if active_category and active_category.id == cat.id %}
+        bg-blue-600 text-white
+   {% else %}
+        bg-gray-200 text-gray-700 hover:bg-gray-300
+   {% endif %}">
+
+            <span class="w-5 h-5 flex items-center justify-center shrink-0">
+                {{ cat.icon|safe }}
+            </span>
+
+            <span>
+                {{ cat.title }}
+            </span>
+
+        </a>
+        {% endfor %}
+
+    </div>
+    {% if page_obj.paginator.count > 0 %}
+    <h1 class="text-3xl font-bold mb-6 text-center">All Posts</h1>
+    {% endif %}
+
+    {% for post in page_obj %}
+    <div class="bg-white shadow-md rounded-lg p-4 mb-6">
+        <p
+            class="text-sm text-gray-500 mb-4 uppercase font-bold tracking-wider">Category:
+            {{ post.category }}
+        </p>
+
+        <div class="relative">
+
+            {% if post.image %}
+            <img src="{{ post.image.url }}"
+                class="w-full h-64 object-cover rounded-sm shadow-sm"
+                alt="{{ post.title }}">
+
+            <div
+                class="absolute top-2 right-2 bg-black/60 rounded-full p-2 flex items-center gap-1">
+
+                <svg width="30px" height="30px" viewBox="-2.4 -2.4 28.80 28.80"
+                    fill="none" xmlns="http://www.w3.org/2000/svg"><g
+                        id="SVGRepo_bgCarrier" stroke-width="0"><path
+                            transform="translate(-2.4, -2.4), scale(0.8999999999999999)"
+                            d="M16,27.117480158217642C18.483364911923093,27.266007998897354,20.42549450363644,30.89473197004894,22.763575869387424,30.04471001012333C24.98377153781817,29.23754602466824,24.094379431691312,25.476604005208795,25.575542711400153,23.636240496448487C27.066018898921175,21.784305585714616,31.55572584917887,21.84290374959289,31.263266067766402,19.483740877848287C30.900339231243247,16.556146821154368,26.34830520603982,16.292255626243396,24.391461524420762,14.084703666454942C23.50085238177209,13.079990833883206,23.622967701525646,11.561692905762916,23.132889211254327,10.311710668178275C22.49031641136203,8.672780165891341,22.331020586855445,6.731579870691473,21.039521183828256,5.535326433301076C19.711697107041942,4.305427207345401,17.78188336197914,4.022130851825848,16,3.704860353352208C14.01053114950963,3.350628540338485,11.815117229317147,2.653866571069934,10.015185858665717,3.5724053810106593C8.211626281443262,4.492795732960323,7.755451937595421,6.840810839650338,6.59855243910949,8.502595753216431C5.512334548611136,10.062852720773325,3.563338411889657,11.226044184028304,3.370209393234429,13.117332711091743C3.1744679445746398,15.03420444118592,4.674873819550452,16.68046115030784,5.590335625685393,18.37593796402893C6.33469624117051,19.75452760714087,7.716158757398245,20.70331387704557,8.259621512090074,22.172745863985984C9.104352276333625,24.456755935726697,7.562925184745197,27.947315271510814,9.615132799508096,29.25831335609434C11.53083795654092,30.48211048725691,13.730818129612867,26.981762414240517,16,27.117480158217642"
+                            fill="#5e58ff" strokewidth="0"></path></g><g
+                        id="SVGRepo_tracerCarrier" stroke-linecap="round"
+                        stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier">
+                        <path
+                            d="M6.03954 7.77203C3.57986 8.32856 2.35002 8.60682 2.05742 9.54773C1.76482 10.4886 2.60325 11.4691 4.2801 13.4299L4.71392 13.9372C5.19043 14.4944 5.42868 14.773 5.53586 15.1177C5.64305 15.4624 5.60703 15.8341 5.53498 16.5776L5.4694 17.2544C5.21588 19.8706 5.08912 21.1787 5.85515 21.7602C6.62118 22.3417 7.77268 21.8115 10.0757 20.7512L10.6715 20.4768C11.3259 20.1755 11.6531 20.0248 12 20.0248C12.3469 20.0248 12.6741 20.1755 13.3285 20.4768L13.9243 20.7512C16.2273 21.8115 17.3788 22.3417 18.1449 21.7602C18.9109 21.1787 18.7841 19.8706 18.5306 17.2544M19.7199 13.4299C21.3968 11.4691 22.2352 10.4886 21.9426 9.54773C21.65 8.60682 20.4201 8.32856 17.9605 7.77203L17.3241 7.62805C16.6251 7.4699 16.2757 7.39083 15.9951 7.17781C15.7144 6.96479 15.5345 6.64193 15.1745 5.99623L14.8468 5.40837C13.5802 3.13612 12.9469 2 12 2C11.0531 2 10.4198 3.13613 9.15316 5.40838"
+                            stroke="#f5f541" stroke-width="1.5"
+                            stroke-linecap="round"></path> </g></svg>
+
+                <span class="text-white text-sm font-bold"><div
+                        class="text-yellow-300">
+                        {% if post.rating_count %}
+                        {{ post.avg_rating|floatformat:1 }}/5
+                        {% else %}
+                        <span class="text-gray-500 text-sm">Not rated</span>
+                        {% endif %}
+                    </div></span>
+            </div>
+
+            {% endif %}
+        </div>
+
+        <p class="text-xs text-gray-400 mt-4">
+            By <span
+                class="text-purple-700 font-bold">{{post.author.username}}</span>
+            | {{ post.created_at|date:"M d, Y"}}
+        </p>
+        <h2
+            class="text-2xl font-bold mt-3 text-gray-900 leading-tight break-words">
+            {{ post.title }}
+        </h2>
+
+        <p class="text-gray-600 text-sm mt-3 leading-relaxed">
+            {{ post.short_description|truncatechars:160 }}
+        </p>
+        <a href="{% url 'post_detail' post.id %}"
+            class="inline-block mt-3 bg-yellow-400 hover:bg-yellow-500 transition px-8 py-3 text-sm font-bold text-black uppercase">
+            Read More >
+        </a>
+
+    </div>
+    {% empty %}
+    <div class="flex flex-col gap-3 items-center justify-center my-5">
+        {% if query %}
+        <h4 class="text-lg font-semibold text-center text-black">
+            No posts found mathing "<span
+                class="text-yellow-600">{{query}}</span>"
+        </h4>
+        <a
+            class="block w-40 text-center  text-lg font-semibold px-6 py-3 text-black bg-yellow-500 hover:bg-yellow-600 transition rounded-md"
+            href="{% url 'all_posts' %}">
+            Clear Search
+        </a>
+        {% else %}
+        <h4 class="text-lg font-semibold text-center text-black">
+            No posts found! Let's create new one
+        </h4>
+        <a
+            class="block w-40 text-center  text-lg font-semibold px-6 py-3 text-black bg-yellow-500 hover:bg-yellow-600 transition rounded-md"
+            href="{% url 'create_post' %}">
+            Create ->
+        </a>
+        {% endif %}
+    </div>
+    {% endfor %}
+
+    <!-- Пагінація -->
+    {% if page_obj.paginator.num_pages > 1 %}
+    <div class="flex justify-center space-x-2 mt-6">
+        {% if page_obj.has_previous %}
+        <a href="?page=1&search={{ request.GET.search }}"
+            class="px-3 py-1 bg-brown-200 rounded"><<</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+        <span class="px-3 py-1 bg-yellow-600 text-white rounded">{{ num}}</span>
+        {% else %}
+        <a href="?page={{ num }}&search={{ request.GET.search }}"
+            class="px-3 py-1 bg-gray-200 rounded">{{num}}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a
+            href="?page={{ page_obj.paginator.num_pages }}&search={{ request.GET.search }}"
+            class="px-3 py-1 bg-gray-200 rounded">>></a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

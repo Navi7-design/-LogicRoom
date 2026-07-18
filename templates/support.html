@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+.slider {
+    scroll-snap-type: x mandatory;
+    overflow-x: auto;
+    display: flex;
+    gap: 10px;
+    padding: 10px 0;
+
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    overflow-y: visible;
+}
+
+.slider::-webkit-scrollbar {
+    display: none;
+}
+
+.snap-item {
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+    flex: 0 0 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    overflow: visible !important;
+}
+.plan {
+    transition: transform 0.3s ease;
+    will-change: transform;
+    position: relative;
+    overflow: visible;
+}
+
+ї.plan.dimmed {
+    opacity: 0.4;
+    transform: scale(0.97);
+}
+
+.plan.active {
+    animation: pulseScale 1.2s ease-in-out infinite;
+}
+
+@keyframes pulseScale {
+    0% {
+        transform: translateY(-10px) scale(1.03);
+    }
+    50% {
+        transform: translateY(-10px) scale(1.10);
+    }
+    100% {
+        transform: translateY(-10px) scale(1.03);
+    }
+}
+</style>
+<div class="max-w-4xl mx-auto px-4 py-12">
+
+    <div class="text-center mb-6">
+        <div
+            class="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold">
+            💙 Support LogicRoom
+        </div>
+
+        <h1 class="text-4xl font-extrabold mt-4 text-gray-900">
+            Choose your Support Tier
+        </h1>
+
+        <p class="text-lg font-semibold text-gray-500 mt-2">
+            Swipe to choose a tier
+        </p>
+    </div>
+
+    <div id="slider" class="slider">
+
+        <div onclick="selectPlan(10, this)" class="snap-item">
+            <div
+                class="plan w-80 bg-green-50 border border-green-200 rounded-2xl p-6 shadow">
+                🌱
+                <h2 class="text-xl font-bold mt-2 text-green-900">New
+                    Supporter</h2>
+                <div class="text-3xl font-black mt-2 text-green-800">10
+                    UAH</div>
+
+                <div class="mt-4 space-y-2 text-sm text-green-700">
+                    <div>✔ Basic badge</div>
+                    <div>✔ Profile label</div>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="selectPlan(49, this)" class="snap-item">
+            <div
+                class="plan w-80 bg-sky-50 border border-sky-200 rounded-2xl p-6 shadow">
+                💙
+                <h2 class="text-xl font-bold mt-2 text-sky-900">Friend</h2>
+                <div class="text-3xl font-black mt-2 text-sky-800">49 UAH</div>
+
+                <div class="mt-4 space-y-2 text-sm text-sky-700">
+                    <div>✔ Friend badge</div>
+                    <div>✔ Profile highlight</div>
+                    <div>✔ Support icon</div>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="selectPlan(100, this)" class="snap-item">
+            <div
+                class="plan relative w-80 bg-gradient-to-br from-blue-600 to-indigo-700 text-white rounded-2xl p-6 shadow-xl">
+
+                <div
+                    class="absolute top-4 right-4 bg-yellow-400 text-black text-xs font-black px-3 py-1 rounded-full shadow-sm">
+                    🔥 POPULAR
+                </div>
+
+                🚀
+                <h2 class="text-xl font-bold mt-2">Supporter</h2>
+                <div class="text-3xl font-black mt-2">100 UAH</div>
+
+                <div class="mt-4 space-y-2 text-sm text-blue-100">
+                    <div>✔ Special badge</div>
+                    <div>✔ Profile glow</div>
+                    <div>✔ Priority appearance</div>
+                    <div>✔ Highlight color</div>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="selectPlan(250, this)" class="snap-item">
+            <div
+                class="plan w-80 bg-emerald-100 border border-emerald-300 rounded-2xl p-6 shadow">
+                ⚡
+                <h2
+                    class="text-xl font-bold mt-2 text-emerald-900">Advanced</h2>
+                <div class="text-3xl font-black mt-2 text-emerald-800">250
+                    UAH</div>
+
+                <div class="mt-4 space-y-2 text-sm text-emerald-700">
+                    <div>✔ Advanced badge</div>
+                    <div>✔ Profile frame</div>
+                    <div>✔ Better ranking</div>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="selectPlan(500, this)" class="snap-item">
+            <div
+                class="plan w-80 bg-purple-50 border border-purple-200 rounded-2xl p-6 shadow">
+                🔮
+                <h2 class="text-xl font-bold mt-2 text-purple-900">Elite</h2>
+                <div class="text-3xl font-black mt-2 text-purple-800">500
+                    UAH</div>
+
+                <div class="mt-4 space-y-2 text-sm text-purple-700">
+                    <div>✔ Elite badge</div>
+                    <div>✔ Animated frame</div>
+                    <div>✔ Premium look</div>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="selectPlan(1000, this)" class="snap-item">
+            <div
+                class="plan w-80 bg-yellow-50 border border-yellow-200 rounded-2xl p-6 shadow">
+                🌟
+                <h2 class="text-xl font-bold mt-2 text-yellow-900">Legend</h2>
+                <div class="text-3xl font-black mt-2 text-yellow-800">1000
+                    UAH</div>
+
+                <div class="mt-4 space-y-2 text-sm text-yellow-700">
+                    <div>✔ Legendary badge</div>
+                    <div>✔ Golden glow</div>
+                    <div>✔ Top ranking</div>
+                </div>
+            </div>
+        </div>
+
+        <div onclick="selectPlan(1500, this)" class="snap-item">
+            <div class="plan w-96 relative bg-gray-900 text-white rounded-3xl p-8 shadow-none overflow-hidden">
+
+                <div
+                    class="absolute inset-0 bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 opacity-30 rounded-3xl">
+                </div>
+
+                <div class="relative z-10 text-center">
+                    🐳
+                    <h2 class="text-2xl font-bold mt-2">VIP Whale</h2>
+                    <div class="text-3xl font-black mt-2">1500 UAH</div>
+
+                    <div class="mt-4 space-y-2 text-sm text-gray-200 text-left">
+                        <div>✔ VIP badge</div>
+                        <div>✔ Secret Discord access</div>
+                        <div>✔ Priority support</div>
+                        <div>✔ Founder status</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-center mt-8">
+        <p id="selectedText" class="text-lg font-semibold text-gray-500 mt-2">
+
+        </p>
+        <button id="donateBtn"
+            onclick="donate()"
+            disabled
+            class="px-10 py-3 rounded-xl bg-gray-300 text-white font-bold transition">
+            ❤️ Donate
+        </button>
+    </div>
+
+</div>
+
+<script>
+
+let selectedAmount = 10;
+
+const slider = document.getElementById("slider");
+const cards = document.querySelectorAll(".snap-item");
+
+function setActive(planEl, amount) {
+
+    selectedAmount = amount;
+
+    document.querySelectorAll(".plan").forEach(p => {
+        p.classList.remove("active");
+    });
+
+    planEl.classList.add("active");
+
+    document.getElementById("selectedText").innerHTML =
+        `Selected: <b>${amount} UAH</b>`;
+
+    const btn = document.getElementById("donateBtn");
+    btn.disabled = false;
+    btn.classList.remove("bg-gray-300");
+    btn.classList.add("bg-blue-600", "hover:bg-blue-700");
+}
+
+let timeout;
+
+slider.addEventListener("scroll", () => {
+    clearTimeout(timeout);
+
+    timeout = setTimeout(() => {
+
+        let closest = null;
+        let minDist = Infinity;
+
+        cards.forEach((card, index) => {
+
+            const plan = card.querySelector(".plan");
+            const rect = card.getBoundingClientRect();
+
+            const dist = Math.abs(rect.left + rect.width / 2 - window.innerWidth / 2);
+
+            if (dist < minDist) {
+                minDist = dist;
+                closest = plan;
+            }
+        });
+
+        if (!closest) return;
+
+        const text = closest.innerText;
+
+        let amount = 10;
+
+        if (text.includes("1500")) amount = 1500;
+        else if (text.includes("1000")) amount = 1000;
+        else if (text.includes("500")) amount = 500;
+        else if (text.includes("250")) amount = 250;
+        else if (text.includes("100")) amount = 100;
+        else if (text.includes("49")) amount = 49;
+
+        setActive(closest, amount);
+
+    }, 5);
+});
+
+window.addEventListener("load", () => {
+    const first = document.querySelector(".plan");
+    if (first) setActive(first, 10);
+});
+
+function donate() {
+    window.open(
+        `https://send.monobank.ua/jar/4haQw4k4AA?amount=${selectedAmount}`,
+        "_blank"
+    );
+}
+
+</script>
+
+{% endblock %}
