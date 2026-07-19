@@ -50,85 +50,110 @@
 
 </section>
 
-<div class="max-w-8xl mx-auto p-6  ">
-    <div class="flex flex-row overflow-x-auto p-4 space-x-4 ">
-        <!-- Блок 1 -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="py-6">
 
         <div
-            class="flex-shrink-0 min-w-[300px] grid md:grid-cols-2 gap-12 border-2 border-blue-400 p-8 bg-white mb-6">
+            class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 border-2 border-blue-400 bg-white rounded-lg p-4 sm:p-6 lg:p-8">
+
+            <!-- Featured Post -->
             {% for post in posts %}
-            <div id="post-{{post.id}}"
-                class="{% if not forloop.first %} md:hidden {% endif %} ">
-                <p
-                    class="text-sm text-gray-500 mb-4 uppercase font-bold tracking-wider">Featured
-                    Post</p>
+            <div
+                id="post-{{ post.id }}"
+                class="{% if not forloop.first %}hidden lg:block{% endif %}">
+
+                <p class="text-xs sm:text-sm text-gray-500 uppercase font-bold tracking-wider mb-4">
+                    Featured Post
+                </p>
 
                 {% if post.image %}
-                <img src="{{ post.image.url }}"
-                    class="w-full h-64 object-cover rounded-sm shadow-sm"
-                    alt="{{ post.title }}">
+                <img
+                    src="{{ post.image.url }}"
+                    alt="{{ post.title }}"
+                    class="w-full h-56 sm:h-72 lg:h-80 object-cover rounded-md shadow">
                 {% endif %}
-                <p
-                    class="text-sm text-gray-500 mb-4 uppercase font-bold tracking-wider">Category:
-                    {{ post.category }}
+
+                <p class="mt-4 text-xs sm:text-sm text-gray-500 uppercase font-bold tracking-wider">
+                    Category: {{ post.category }}
                 </p>
 
-                <p class="text-xs text-gray-400 mt-4">
-                    By <span
-                        class="text-purple-700 font-bold">{{post.author.username}}</span>
-                    | {{post.created_at|date:"M d, Y"}}
+                <p class="mt-3 text-xs text-gray-400">
+                    By
+                    <span class="text-purple-700 font-bold">
+                        {{ post.author.username }}
+                    </span>
+                    |
+                    {{ post.created_at|date:"M d, Y" }}
                 </p>
 
-                <h2
-                    class="text-2xl font-bold mt-3 text-gray-900 leading-tight">
+                <h2 class="mt-3 text-2xl lg:text-3xl font-bold text-gray-900 leading-tight">
                     {{ post.title }}
                 </h2>
 
-                <p
-                    class="text-gray-600 text-sm mt-3 leading-relaxed">
-                    {{ post.short_description|truncatechars:160}}
+                <p class="mt-4 text-gray-600 text-sm sm:text-base leading-relaxed">
+                    {{ post.short_description|truncatechars:160 }}
                 </p>
 
-                <a href="{% url 'post_detail' post.id %}"
-                    class="inline-block mt-3 bg-yellow-400 hover:bg-yellow-500 transition px-8 py-3 text-sm font-bold text-black uppercase">
+                <a
+                    href="{% url 'post_detail' post.id %}"
+                    class="inline-block mt-6 bg-yellow-400 hover:bg-yellow-500 transition duration-200 px-6 py-3 rounded font-bold uppercase text-sm">
                     Read More >
                 </a>
+
             </div>
             {% endfor %}
 
-            <div class="hidden md:block">
-                <div class="flex justify-between items-center mb-4">
-                    <p
-                        class="text-sm text-gray-500 uppercase font-bold tracking-wider">All
-                        Posts</p>
-                    <a href="{% url 'posts' %}"
-                        class="text-purple-700 text-xs font-bold hover:underline">View
-                        All</a>
+            <!-- All Posts -->
+            <div class="hidden lg:block">
+
+                <div class="flex items-center justify-between mb-6">
+
+                    <p class="text-sm text-gray-500 uppercase font-bold tracking-wider">
+                        All Posts
+                    </p>
+
+                    <a
+                        href="{% url 'posts' %}"
+                        class="text-purple-700 text-sm font-bold hover:underline">
+                        View All
+                    </a>
+
                 </div>
 
                 <div class="space-y-4">
+
                     {% for post in posts|slice:"0:3" %}
+
                     <div
-                        data-id="{{post.id}}"
-                        class="posts-preview p-5 transition-all{% if forloop.first %} bg-[#FBF6EA] {% endif %}">
+                        data-id="{{ post.id }}"
+                        class="posts-preview cursor-pointer rounded-lg p-5 transition duration-200 hover:bg-gray-100 {% if forloop.first %}bg-[#FBF6EA]{% endif %}">
+
                         <p class="text-xs text-gray-400 mb-2">
-                            By <span
-                                class="text-purple-700 font-semibold">{{post.author.username}}</span>
+                            By
+                            <span class="text-purple-700 font-semibold">
+                                {{ post.author.username }}
+                            </span>
                             |
-                            {{post.created_at|date:"M d, Y" }}
+                            {{ post.created_at|date:"M d, Y" }}
                         </p>
-                        <p
-                            class="font-bold text-gray-800 text-md leading-snug">
+
+                        <p class="font-bold text-gray-800 leading-snug">
                             {{ post.title }}
                         </p>
+
                     </div>
+
                     {% endfor %}
+
                 </div>
+
             </div>
 
         </div>
 
     </div>
+
 </div>
 
 <div class="grid md:grid-cols-2 mt-12 bg-gray-200 p-8 gap-8">
