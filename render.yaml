@@ -2,55 +2,77 @@ databases:
   - name: blog-db
     plan: free
     databaseName: blog
-    user: blogAppAdmin
 
 services:
   - type: web
-    plan: free
     name: blog-web
     runtime: python
-    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
-    startCommand: "python -m gunicorn blog.asgi:application -k uvicorn.workers.UvicornWorker"
+    plan: free
+
+    buildCommand: >
+      pip install -r requirements.txt &&
+      python manage.py collectstatic --noinput &&
+      python manage.py migrate
+
+    startCommand: gunicorn blog.wsgi:application
+
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: blog-db
           property: connectionString
+
       - key: SECRET_KEY
         generateValue: true
+
       - key: DEBUG
         sync: false
+
       - key: ALLOWED_HOSTS
         sync: false
+
       - key: SITE_URL
         sync: false
+
       - key: EMAIL_HOST_USER
         sync: false
+
       - key: EMAIL_HOST_PASSWORD
         sync: false
+
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
+
       - key: CLOUDINARY_API_KEY
         sync: false
+
       - key: CLOUDINARY_API_SECRET
         sync: false
 
   - type: cron
     name: blog-daily-digest
     runtime: python
-    buildCommand: "pip install -r requirements.txt"
+
+    buildCommand: pip install -r requirements.txt
+
     schedule: "0 * * * *"
-    startCommand: "python manage.py send_digest"
+
+    startCommand: python manage.py send_digest
+
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: blog-db
           property: connectionString
+
       - key: SECRET_KEY
         generateValue: true
+
       - key: EMAIL_HOST_USER
         sync: false
+
       - key: EMAIL_HOST_PASSWORD
         sync: false
+
       - key: SITE_URL
         sync: false
