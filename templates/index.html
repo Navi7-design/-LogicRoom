@@ -50,96 +50,66 @@
 
 </section>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="py-4">
-
-        <div
-            class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 border-2 border-blue-400 p-4 sm:p-6 md:p-8 bg-white mb-6 rounded-lg">
-
+<div class="max-w-8xl mx-auto p-4 md:p-6">
+    <!-- На мобільних: скрол карток ліворуч-праворуч. На десктопі: звичайна сітка -->
+    <div class="flex overflow-x-auto snap-x snap-mandatory pb-6 space-x-4 md:space-x-0 md:overflow-x-visible md:pb-0 md:grid md:grid-cols-2 md:gap-12 border-2 border-blue-400 p-4 md:p-8 bg-white mb-6">
+        
+        <!-- ЛІВА КОЛОНКА (Головний пост) -->
+        <div class="flex-shrink-0 w-[85vw] sm:w-[350px] snap-start md:w-auto md:flex-shrink">
             {% for post in posts %}
-            <div id="post-{{post.id}}"
-                class="{% if not forloop.first %}hidden md:block{% endif %}">
-
-                <p class="text-sm text-gray-500 mb-4 uppercase font-bold tracking-wider">
+            <!-- На мобільних показуємо лише перший пост для чистішого екрану, або прибирай md:hidden, якщо треба всі -->
+            <div id="post-{{post.id}}" class="{% if not forloop.first %} hidden md:hidden {% endif %}">
+                <p class="text-xs md:text-sm text-gray-500 mb-3 md:mb-4 uppercase font-bold tracking-wider">
                     Featured Post
                 </p>
 
                 {% if post.image %}
-                <img src="{{ post.image.url }}"
-                    class="w-full h-52 sm:h-64 object-cover rounded-sm shadow-sm"
-                    alt="{{ post.title }}">
+                <img src="{{ post.image.url }}" class="w-full h-48 md:h-64 object-cover rounded-sm shadow-sm" alt="{{ post.title }}">
                 {% endif %}
-
-                <p class="text-sm text-gray-500 mt-4 uppercase font-bold tracking-wider">
+                
+                <p class="text-xs md:text-sm text-gray-500 my-3 uppercase font-bold tracking-wider">
                     Category: {{ post.category }}
                 </p>
 
-                <p class="text-xs text-gray-400 mt-4">
-                    By
-                    <span class="text-purple-700 font-bold">
-                        {{post.author.username}}
-                    </span>
-                    | {{post.created_at|date:"M d, Y"}}
+                <p class="text-xs text-gray-400">
+                    By <span class="text-purple-700 font-bold">{{post.author.username}}</span> | {{post.created_at|date:"M d, Y"}}
                 </p>
 
-                <h2 class="text-xl sm:text-2xl font-bold mt-3 text-gray-900 leading-tight">
+                <h2 class="text-xl md:text-2xl font-bold mt-2 text-gray-900 leading-tight">
                     {{ post.title }}
                 </h2>
 
-                <p class="text-gray-600 text-sm mt-3 leading-relaxed">
-                    {{ post.short_description|truncatechars:160 }}
+                <p class="text-gray-600 text-sm mt-2 md:mt-3 leading-relaxed">
+                    {{ post.short_description|truncatechars:160}}
                 </p>
 
-                <a href="{% url 'post_detail' post.id %}"
-                    class="inline-block mt-4 bg-yellow-400 hover:bg-yellow-500 transition px-6 py-3 text-sm font-bold text-black uppercase rounded">
+                <a href="{% url 'post_detail' post.id %}" class="inline-block mt-4 bg-yellow-400 hover:bg-yellow-500 transition px-6 py-3 text-xs md:text-sm font-bold text-black uppercase tracking-wider">
                     Read More >
                 </a>
-
             </div>
             {% endfor %}
+        </div>
 
-            <div class="hidden md:block">
-
-                <div class="flex justify-between items-center mb-4">
-                    <p class="text-sm text-gray-500 uppercase font-bold tracking-wider">
-                        All Posts
-                    </p>
-
-                    <a href="{% url 'posts' %}"
-                        class="text-purple-700 text-xs font-bold hover:underline">
-                        View All
-                    </a>
-                </div>
-
-                <div class="space-y-4">
-
-                    {% for post in posts|slice:"0:3" %}
-
-                    <div
-                        data-id="{{post.id}}"
-                        class="posts-preview p-5 transition-all rounded-lg cursor-pointer {% if forloop.first %}bg-[#FBF6EA]{% endif %}">
-
-                        <p class="text-xs text-gray-400 mb-2">
-                            By
-                            <span class="text-purple-700 font-semibold">
-                                {{post.author.username}}
-                            </span>
-                            |
-                            {{post.created_at|date:"M d, Y"}}
-                        </p>
-
-                        <p class="font-bold text-gray-800 text-md leading-snug">
-                            {{ post.title }}
-                        </p>
-
-                    </div>
-
-                    {% endfor %}
-
-                </div>
-
+        <!-- ПРАВА КОЛОНКА (Список усіх постів) -->
+        <!-- На мобільних перетворюється на другу картку в скролі. На десктопі — права частина гріда -->
+        <div class="flex-shrink-0 w-[85vw] sm:w-[350px] snap-start md:w-auto md:flex-shrink bg-gray-50 md:bg-transparent p-4 md:p-0 rounded-sm">
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-xs md:text-sm text-gray-500 uppercase font-bold tracking-wider">All Posts</p>
+                <a href="{% url 'posts' %}" class="text-purple-700 text-xs font-bold hover:underline">View All</a>
             </div>
 
+            <div class="space-y-3 md:space-y-4">
+                {% for post in posts|slice:"0:3" %}
+                <div data-id="{{post.id}}" class="posts-preview p-4 md:p-5 transition-all bg-white md:bg-transparent {% if forloop.first %} !bg-[#FBF6EA] {% endif %} border border-gray-100 md:border-0 shadow-sm md:shadow-none rounded-sm">
+                    <p class="text-xs text-gray-400 mb-1">
+                        By <span class="text-purple-700 font-semibold">{{post.author.username}}</span> | {{post.created_at|date:"M d, Y" }}
+                    </p>
+                    <p class="font-bold text-gray-800 text-sm md:text-md leading-snug layout-title">
+                        {{ post.title }}
+                    </p>
+                </div>
+                {% endfor %}
+            </div>
         </div>
 
     </div>
