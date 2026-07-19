@@ -50,71 +50,42 @@
 
 </section>
 
-<div class="max-w-8xl mx-auto p-4 sm:p-6">
-    <div class="grid md:grid-cols-2 gap-8 md:gap-12 border-2 border-blue-400 p-4 sm:p-8 bg-white mb-6">
-
-        <!-- Featured Post: показуємо лише перший пост -->
-        {% for post in posts %}
-        {% if forloop.first %}
-        <div id="post-{{ post.id }}">
-            <p class="text-sm text-gray-500 mb-4 uppercase font-bold tracking-wider">
-                Featured Post
-            </p>
-            {% if post.image %}
-            <img src="{{ post.image.url }}"
-                 class="w-full h-52 sm:h-64 object-cover rounded-sm shadow-sm"
-                 alt="{{ post.title }}">
-            {% endif %}
-            <p class="text-sm text-gray-500 mb-4 mt-4 uppercase font-bold tracking-wider">
-                Category: {{ post.category }}
-            </p>
-            <p class="text-xs text-gray-400 mt-4">
-                By <span class="text-purple-700 font-bold">{{ post.author.username }}</span>
-                | {{ post.created_at|date:"M d, Y" }}
-            </p>
-            <h2 class="text-xl sm:text-2xl font-bold mt-3 text-gray-900 leading-tight">
-                {{ post.title }}
-            </h2>
-            <p class="text-gray-600 text-sm mt-3 leading-relaxed">
-                {{ post.short_description|truncatechars:160 }}
-            </p>
-            <a href="{% url 'post_detail' post.id %}"
-               class="inline-block mt-3 bg-yellow-400 hover:bg-yellow-500 transition px-6 sm:px-8 py-3 text-sm font-bold text-black uppercase">
-                Read More >
-            </a>
-        </div>
-        {% endif %}
-        {% endfor %}
-
-        <!-- Список постів: видно і на телефоні, і на ноуті -->
-        <div>
-            <div class="flex justify-between items-center mb-4">
-                <p class="text-sm text-gray-500 uppercase font-bold tracking-wider">
-                    All Posts
-                </p>
-                <a href="{% url 'posts' %}"
-                   class="text-purple-700 text-xs font-bold hover:underline">
-                    View All
-                </a>
-            </div>
-            <div class="space-y-4">
-                {% for post in posts|slice:"0:3" %}
-                <div data-id="{{ post.id }}"
-                     class="posts-preview p-4 sm:p-5 rounded-sm transition-all{% if forloop.first %} bg-[#FBF6EA]{% endif %}">
-                    <p class="text-xs text-gray-400 mb-2">
-                        By <span class="text-purple-700 font-semibold">{{ post.author.username }}</span>
-                        | {{ post.created_at|date:"M d, Y" }}
-                    </p>
-                    <p class="font-bold text-gray-800 text-md leading-snug">
-                        {{ post.title }}
-                    </p>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-
-    </div>
-</div>
+<div class="max-w-8xl mx-auto p-6 "> <div
+        class="flex flex-row overflow-x-auto p-4 space-x-4 "> 
+        <div
+            class="flex-shrink-0 min-w-[300px] grid md:grid-cols-2 gap-12 border-2 border-blue-400 p-8 bg-white mb-6">
+            {% for post in posts %} <div id="post-{{post.id}}"
+                class="{% if not forloop.first %} md:hidden {% endif %} "> <p
+                    class="text-sm text-gray-500 mb-4 uppercase font-bold tracking-wider">Featured
+                    Post</p> {% if post.image %} <img src="{{ post.image.url }}"
+                    class="w-full h-64 object-cover rounded-sm shadow-sm"
+                    alt="{{ post.title }}"> {% endif %} <p
+                    class="text-sm text-gray-500 mb-4 uppercase font-bold tracking-wider">Category:
+                    {{ post.category }} </p> <p
+                    class="text-xs text-gray-400 mt-4"> By <span
+                        class="text-purple-700 font-bold">{{post.author.username}}</span>
+                    | {{post.created_at|date:"M d, Y"}} </p> <h2
+                    class="text-2xl font-bold mt-3 text-gray-900 leading-tight">
+                    {{ post.title }} </h2> <p
+                    class="text-gray-600 text-sm mt-3 leading-relaxed"> {{
+                    post.short_description|truncatechars:160}} </p> <a
+                    href="{% url 'post_detail' post.id %}"
+                    class="inline-block mt-3 bg-yellow-400 hover:bg-yellow-500 transition px-8 py-3 text-sm font-bold text-black uppercase">
+                    Read More > </a> </div> {% endfor %} <div
+                class="hidden md:block"> <div
+                    class="flex justify-between items-center mb-4"> <p
+                        class="text-sm text-gray-500 uppercase font-bold tracking-wider">All
+                        Posts</p> <a href="{% url 'posts' %}"
+                        class="text-purple-700 text-xs font-bold hover:underline">View
+                        All</a> </div> <div class="space-y-4"> {% for post in
+                    posts|slice:"0:3" %} <div data-id="{{post.id}}"
+                        class="posts-preview p-5 transition-all{% if forloop.first %} bg-[#FBF6EA] {% endif %}">
+                        <p class="text-xs text-gray-400 mb-2"> By <span
+                                class="text-purple-700 font-semibold">{{post.author.username}}</span>
+                            | {{post.created_at|date:"M d, Y" }} </p> <p
+                            class="font-bold text-gray-800 text-md leading-snug">
+                            {{ post.title }} </p> </div> {% endfor %} </div>
+            </div> </div> </div> </div>
 
 <div class="grid md:grid-cols-2 mt-12 bg-gray-200 p-8 gap-8">
 
