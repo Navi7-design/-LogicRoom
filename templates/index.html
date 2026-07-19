@@ -53,7 +53,7 @@
 <div class="max-w-8xl mx-auto p-4 sm:p-6">
     <div class="grid md:grid-cols-2 gap-8 md:gap-12 border-2 border-blue-400 p-4 sm:p-8 bg-white mb-6">
 
-        <!-- Featured Post: показуємо лише перший пост, і на телефоні, і на ноуті -->
+        <!-- Featured Post: показуємо лише перший пост -->
         {% for post in posts %}
         {% if forloop.first %}
         <div id="post-{{ post.id }}">
@@ -86,7 +86,7 @@
         {% endif %}
         {% endfor %}
 
-        <!-- Список постів: тепер видно і на телефоні, і на ноуті -->
+        <!-- Список постів: видно і на телефоні, і на ноуті -->
         <div>
             <div class="flex justify-between items-center mb-4">
                 <p class="text-sm text-gray-500 uppercase font-bold tracking-wider">
